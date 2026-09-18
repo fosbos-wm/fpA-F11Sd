@@ -2538,7 +2538,7 @@ verwaltest du Praktikumsphasen, Blockberichte und die Besuchstermine – alles r
 </div><div class="actions">${isTeacher()?`<button class="primary"onclick="openNewsForm()">＋ News veröffentlichen</button>`:""}<button class="secondary"onclick="go('praktikum')">fpA öffnen →</button><button class="secondary"onclick="go('praktikumsbesuche')">Praktikumsbesuche</button></div></section>
  <div class="grid grid-3">
  <div class="card card-compact"style="border-left:4px solid #4a90d9"><h3> Campus-News</h3><div class="list">${news.slice(0,3).map(p=>`<div
-class="list-item"><div><strong>${esc(p.title||p.text)}</strong>${p.title?`<small>${esc(p.text)} · ${fmtDate(p.createdAt)}</small>`:`<small>${fmtDate(p.createdAt)}</small>`}</div><div style="display:flex;align-items:center;gap:8px"><span class="pill">Info</span>${isTeacher()?`<button class="secondary"style="padding:4px 10px;font-size:12px"onclick="openEditNewsForm('${p.id}','${esc(String(p.title||"").replace(/\n/g,"\\n"))}','${esc(String(p.text||"").replace(/\n/g,"\\n"))}')">Bearbeiten</button>`:""}${isAdmin()?`<button class="secondary"style="padding:4px 10px;font-size:12px"onclick="deleteNews('${p.id}')">Löschen</button>`:""}</div>
+class="list-item"style="display:block"><strong style="display:block">${esc(p.title||p.text)}</strong>${p.title?`<small style="display:block;margin-top:2px">${esc(p.text)} · ${fmtDate(p.createdAt)}</small>`:`<small style="display:block;margin-top:2px">${fmtDate(p.createdAt)}</small>`}<div style="display:flex;align-items:center;gap:8px;margin-top:8px"><span class="pill">Info</span>${isTeacher()?`<button class="secondary"style="padding:4px 10px;font-size:12px"onclick="openEditNewsForm('${p.id}','${esc(String(p.title||"").replace(/\n/g,"\\n"))}','${esc(String(p.text||"").replace(/\n/g,"\\n"))}')">Bearbeiten</button>`:""}${isAdmin()?`<button class="secondary"style="padding:4px 10px;font-size:12px"onclick="deleteNews('${p.id}')">Löschen</button>`:""}</div>
 </div>`).join("")||`<div class="empty">Noch keine News.</div>`}</div></div>
  <div class="card card-compact"style="border-left:4px solid #9b59b6"><h3> Nächster Termin</h3><div class="list">${nextCalendar?`<div class="list-item"><div><strong>${esc(nextCalendar.title||nextCalendar.name||"Termin")}</strong><small>${esc(upcomingDateText)}${upcomingTime}</small></div><span class="pill green">Termin</span></div>`:`<div class="empty">Noch keine anstehenden Termine.</div>`}</div></div>
  <div class="card card-compact"style="border-left:4px solid #e0629e"><h3> Geburtstage</h3>${
@@ -10146,7 +10146,7 @@ async function render(){
  const pages={
  start:renderStart,klassenteam:renderKlassenteam,
  praktikum:renderPraktikum,praktikumsbesuche:renderPraktikumsbesuche,
- kalender:renderKalender,team:renderTeam
+ kalender:renderKalender
  };
  // Diese App zeigt bewusst nur den fpA-Anteil – alle anderen Routen (aus
  // der F11Sb-Basis mitkopiert, aber hier nicht vorgesehen) leiten zur
