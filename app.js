@@ -8282,7 +8282,8 @@ async function renderKalender(){
  praesentation:{label:"Präsentation",className:"cal-purple"},
  sonstiges:{label:"Sonstiger Termin",className:"cal-grey"},
  geburtstag:{label:"Geburtstag",className:"cal-birthday"},
- ferien:{label:"Schulferien Bayern",className:"cal-holiday"}
+ ferien:{label:"Schulferien Bayern",className:"cal-holiday"},
+ fpa:{label:"fpA-Abgabe",className:"cal-gold"}
  };
 
  // Schulferien Bayern – Schuljahr 2026/27.
@@ -8367,6 +8368,9 @@ async function renderKalender(){
  ).join("");
 
  const html=`${pageHead("ORGANISATION","Campus-Kalender","Das Schuljahr 26/27 auf einen Blick. Termine sind je nach Terminart farblich gekennzeichnet.",`${addButton}${birthdayButton}${exportButton}`)}
+ <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+ ${Object.entries(typeMeta).map(([key,m])=>`<span class="pill ${m.className}"style="font-size:11px">${esc(m.label)}</span>`).join("")}
+ </div>
  <style>
  .cal-months{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
  .cal-month{padding:18px}.cal-month-head{margin-bottom:10px}
@@ -8382,6 +8386,7 @@ async function renderKalender(){
  .cal-yellow{background:#fef3c7!important}.cal-purple{background:#ede9fe!important}.cal-grey{background:#e5e7eb!important}
  .cal-holiday{background:#e3f5da!important;border-color:#8bc34a!important}
  .cal-birthday{background:#ffe4ec!important;border-color:#f472b6!important}
+ .cal-gold{background:#fdf0c8!important;border-color:#d4a017!important;font-weight:700!important}
  .cal-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
  .cal-legend-item{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff;font-size:12px}
  .cal-legend-dot{width:13px;height:13px;border-radius:3px;border:1px solid rgba(0,0,0,.12)}
@@ -8523,7 +8528,8 @@ function calendarTypeMeta(e){
  praesentation:{label:"Präsentation",className:"cal-purple"},
  sonstiges:{label:"Sonstiger Termin",className:"cal-grey"},
  geburtstag:{label:"Geburtstag",className:"cal-birthday"},
- ferien:{label:"Schulferien Bayern",className:"cal-holiday"}
+ ferien:{label:"Schulferien Bayern",className:"cal-holiday"},
+ fpa:{label:"fpA-Abgabe",className:"cal-gold"}
  })[key]||{label:"Sonstiger Termin",className:"cal-grey"};
 }
 
@@ -10835,6 +10841,7 @@ function openCalendarForm(){
  <option value="projektvorstellung">Projektvorstellung</option>
  <option value="referat">Referat</option>
  <option value="praesentation">Präsentation</option>
+ <option value="fpa">fpA-Abgabe</option>
  <option value="sonstiges">Sonstiger Termin / frei wählbar</option>
  </select>
  </label>
@@ -10892,6 +10899,7 @@ function editCalendarEntry(collectionName,id,title,type,date,time,location,descr
  <option value="projektvorstellung">Projektvorstellung</option>
  <option value="referat">Referat</option>
  <option value="praesentation">Präsentation</option>
+ <option value="fpa">fpA-Abgabe</option>
  <option value="sonstiges">Sonstiger Termin / frei wählbar</option>
  </select>
  </label>
