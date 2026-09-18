@@ -8251,14 +8251,7 @@ async function exportCampusCalendarICS(){
  const ferienRangeEvents=ferienZeitraeume.map(([start,end,label])=>(
  {start,rangeEnd:end,title:label,description:"Schulferien in Bayern"}
  ));
- const fpaEventsICS=[];
- PRAKTIKUMSPHASEN.forEach(p=>{
- praktikumsberichtTypenFuerPhase(p.id).forEach(t=>{
- const termin=t.typ==="einschaetzung"?einschaetzungFrist(p.id):letzterDonnerstagVorOrAm(p.end);
- fpaEventsICS.push({start:termin,title:`Abgabe ${t.label} – ${p.titel.replace("Praktikum – B-Block – ","")}`,description:"Abgabe bis 19:00 Uhr."});
- });
- });
- downloadICS([...events,...birthdayEvents,...ferienRangeEvents,...fpaEventsICS],"campuskalender.ics","F11Sd Kalender");
+ downloadICS([...events,...birthdayEvents,...ferienRangeEvents],"campuskalender.ics","F11Sd Kalender");
  toast("Kalender wird heruntergeladen – Datei öffnen, um sie zum Handy-Kalender hinzuzufügen.");
  }catch(e){console.error("Kalender-Export:",e);toast("Der Kalender konnte nicht exportiert werden.")}
 }
@@ -8289,8 +8282,7 @@ async function renderKalender(){
  praesentation:{label:"Präsentation",className:"cal-purple"},
  sonstiges:{label:"Sonstiger Termin",className:"cal-grey"},
  geburtstag:{label:"Geburtstag",className:"cal-birthday"},
- ferien:{label:"Schulferien Bayern",className:"cal-holiday"},
- fpa:{label:"fpA-Abgabe",className:"cal-gold"}
+ ferien:{label:"Schulferien Bayern",className:"cal-holiday"}
  };
 
  // Schulferien Bayern – Schuljahr 2026/27.
@@ -8316,22 +8308,9 @@ async function renderKalender(){
  });
  }
  });
- // Alle verpflichtenden fpA-Abgabetermine – automatisch aus den
- // Praktikumsphasen berechnet, damit sie nie von Hand gepflegt werden müssen.
- const fpaEvents=[];
- PRAKTIKUMSPHASEN.forEach(p=>{
- praktikumsberichtTypenFuerPhase(p.id).forEach(t=>{
- const termin=t.typ==="einschaetzung"?einschaetzungFrist(p.id):letzterDonnerstagVorOrAm(p.end);
- fpaEvents.push({
- start:termin,type:"fpa",
- title:`Abgabe ${t.label} – ${p.titel.replace("Praktikum – B-Block – ","")}`,
- description:"Abgabe bis 19:00 Uhr."
- });
- });
- });
  let birthdayEvents=[];
  try{birthdayEvents=await getBirthdayEvents()}catch(e){console.error("Kalender Geburtstage:",e)}
- events=[...events,...birthdayEvents,...ferienEvents,...fpaEvents];
+ events=[...events,...birthdayEvents,...ferienEvents];
 
  const normalizeType=e=>{
  const raw=String(e?.type||e?.eventType||e?.category||"sonstiges").toLowerCase().trim();
@@ -8403,7 +8382,6 @@ async function renderKalender(){
  .cal-yellow{background:#fef3c7!important}.cal-purple{background:#ede9fe!important}.cal-grey{background:#e5e7eb!important}
  .cal-holiday{background:#e3f5da!important;border-color:#8bc34a!important}
  .cal-birthday{background:#ffe4ec!important;border-color:#f472b6!important}
- .cal-gold{background:#fdf0c8!important;border-color:#d4a017!important;font-weight:700!important}
  .cal-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
  .cal-legend-item{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff;font-size:12px}
  .cal-legend-dot{width:13px;height:13px;border-radius:3px;border:1px solid rgba(0,0,0,.12)}
@@ -8545,8 +8523,7 @@ function calendarTypeMeta(e){
  praesentation:{label:"Präsentation",className:"cal-purple"},
  sonstiges:{label:"Sonstiger Termin",className:"cal-grey"},
  geburtstag:{label:"Geburtstag",className:"cal-birthday"},
- ferien:{label:"Schulferien Bayern",className:"cal-holiday"},
- fpa:{label:"fpA-Abgabe",className:"cal-gold"}
+ ferien:{label:"Schulferien Bayern",className:"cal-holiday"}
  })[key]||{label:"Sonstiger Termin",className:"cal-grey"};
 }
 
