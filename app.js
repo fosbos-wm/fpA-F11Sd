@@ -2538,7 +2538,7 @@ verwaltest du Praktikumsphasen, Blockberichte und die Besuchstermine – alles r
 </div><div class="actions">${isTeacher()?`<button class="primary"onclick="openNewsForm()">＋ News veröffentlichen</button>`:""}<button class="secondary"onclick="go('praktikum')">fpA öffnen →</button><button class="secondary"onclick="go('praktikumsbesuche')">Praktikumsbesuche</button></div></section>
  <div class="grid grid-3">
  <div class="card card-compact"style="border-left:4px solid #4a90d9"><h3> Campus-News</h3><div class="list">${news.slice(0,3).map(p=>`<div
-class="list-item"><div><strong>${esc(p.title||p.text)}</strong>${p.title?`<small>${esc(p.text)} · ${fmtDate(p.createdAt)}</small>`:`<small>${fmtDate(p.createdAt)}</small>`}</div><div style="display:flex;align-items:center;gap:8px"><span class="pill">Info</span>${isTeacher()?`<button class="secondary"onclick="openEditNewsForm('${p.id}','${esc(String(p.title||"").replace(/\n/g,"\\n"))}','${esc(String(p.text||"").replace(/\n/g,"\\n"))}')">Bearbeiten</button>`:""}${isAdmin()?`<button class="secondary"onclick="deleteNews('${p.id}')">Löschen</button>`:""}</div>
+class="list-item"><div><strong>${esc(p.title||p.text)}</strong>${p.title?`<small>${esc(p.text)} · ${fmtDate(p.createdAt)}</small>`:`<small>${fmtDate(p.createdAt)}</small>`}</div><div style="display:flex;align-items:center;gap:8px"><span class="pill">Info</span>${isTeacher()?`<button class="secondary"style="padding:4px 10px;font-size:12px"onclick="openEditNewsForm('${p.id}','${esc(String(p.title||"").replace(/\n/g,"\\n"))}','${esc(String(p.text||"").replace(/\n/g,"\\n"))}')">Bearbeiten</button>`:""}${isAdmin()?`<button class="secondary"style="padding:4px 10px;font-size:12px"onclick="deleteNews('${p.id}')">Löschen</button>`:""}</div>
 </div>`).join("")||`<div class="empty">Noch keine News.</div>`}</div></div>
  <div class="card card-compact"style="border-left:4px solid #9b59b6"><h3> Nächster Termin</h3><div class="list">${nextCalendar?`<div class="list-item"><div><strong>${esc(nextCalendar.title||nextCalendar.name||"Termin")}</strong><small>${esc(upcomingDateText)}${upcomingTime}</small></div><span class="pill green">Termin</span></div>`:`<div class="empty">Noch keine anstehenden Termine.</div>`}</div></div>
  <div class="card card-compact"style="border-left:4px solid #e0629e"><h3> Geburtstage</h3>${
@@ -8251,7 +8251,11 @@ async function exportCampusCalendarICS(){
  const ferienRangeEvents=ferienZeitraeume.map(([start,end,label])=>(
  {start,rangeEnd:end,title:label,description:"Schulferien in Bayern"}
  ));
- downloadICS([...events,...birthdayEvents,...ferienRangeEvents],"campuskalender.ics","F11Sd Kalender");
+ const feiertagEventsICS=[
+ {start:"2027-05-06",title:"Christi Himmelfahrt",description:"Gesetzlicher Feiertag in Bayern."},
+ {start:"2027-05-17",title:"Pfingstmontag",description:"Gesetzlicher Feiertag in Bayern."}
+ ];
+ downloadICS([...events,...birthdayEvents,...ferienRangeEvents,...feiertagEventsICS],"campuskalender.ics","F11Sd Kalender");
  toast("Kalender wird heruntergeladen – Datei öffnen, um sie zum Handy-Kalender hinzuzufügen.");
  }catch(e){console.error("Kalender-Export:",e);toast("Der Kalender konnte nicht exportiert werden.")}
 }
@@ -8283,7 +8287,8 @@ async function renderKalender(){
  sonstiges:{label:"Sonstiger Termin",className:"cal-grey"},
  geburtstag:{label:"Geburtstag",className:"cal-birthday"},
  ferien:{label:"Schulferien Bayern",className:"cal-holiday"},
- fpa:{label:"fpA-Abgabe",className:"cal-gold"}
+ fpa:{label:"fpA-Abgabe",className:"cal-gold"},
+ feiertag:{label:"Gesetzlicher Feiertag",className:"cal-teal"}
  };
 
  // Schulferien Bayern – Schuljahr 2026/27.
@@ -8309,9 +8314,16 @@ async function renderKalender(){
  });
  }
  });
+ // Gesetzliche Feiertage in Bayern, die tatsächlich in die Schulzeit fallen
+ // (alle anderen liegen entweder in den o.g. Ferien oder auf einem
+ // Wochenende und sind daher hier nicht extra aufgeführt).
+ const feiertagEvents=[
+ {start:"2027-05-06",type:"feiertag",title:"Christi Himmelfahrt",description:"Gesetzlicher Feiertag in Bayern."},
+ {start:"2027-05-17",type:"feiertag",title:"Pfingstmontag",description:"Gesetzlicher Feiertag in Bayern."}
+ ];
  let birthdayEvents=[];
  try{birthdayEvents=await getBirthdayEvents()}catch(e){console.error("Kalender Geburtstage:",e)}
- events=[...events,...birthdayEvents,...ferienEvents];
+ events=[...events,...birthdayEvents,...ferienEvents,...feiertagEvents];
 
  const normalizeType=e=>{
  const raw=String(e?.type||e?.eventType||e?.category||"sonstiges").toLowerCase().trim();
@@ -8387,6 +8399,7 @@ async function renderKalender(){
  .cal-holiday{background:#e3f5da!important;border-color:#8bc34a!important}
  .cal-birthday{background:#ffe4ec!important;border-color:#f472b6!important}
  .cal-gold{background:#fdf0c8!important;border-color:#d4a017!important;font-weight:700!important}
+ .cal-teal{background:#c9ede6!important;border-color:#1a9b8e!important}
  .cal-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
  .cal-legend-item{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff;font-size:12px}
  .cal-legend-dot{width:13px;height:13px;border-radius:3px;border:1px solid rgba(0,0,0,.12)}
@@ -8529,7 +8542,8 @@ function calendarTypeMeta(e){
  sonstiges:{label:"Sonstiger Termin",className:"cal-grey"},
  geburtstag:{label:"Geburtstag",className:"cal-birthday"},
  ferien:{label:"Schulferien Bayern",className:"cal-holiday"},
- fpa:{label:"fpA-Abgabe",className:"cal-gold"}
+ fpa:{label:"fpA-Abgabe",className:"cal-gold"},
+ feiertag:{label:"Gesetzlicher Feiertag",className:"cal-teal"}
  })[key]||{label:"Sonstiger Termin",className:"cal-grey"};
 }
 
@@ -8613,8 +8627,8 @@ async function renderTeam(){
  <p class="team-history-text">${esc(u.text||"")}</p>
  ${u.followUp?`<div class="notice"style="margin-top:10px"><strong>Nächster Schritt / Vereinbarung</strong><p style="margin-bottom:0;white-space:pre-wrap">${esc(u.followUp)}</p></div>`:""}
  <div class="form-actions"style="margin-top:10px">
- <button class="secondary"onclick="openEditClassTeamUpdateForm('${u.id}','${esc(String(u.date||"").replace(/\n/g,"\\n"))}','${esc(u.type||"info")}','${esc(String(u.title||"").replace(/\n/g,"\\n"))}','${esc(String(u.text||"").replace(/\n/g,"\\n"))}','${esc(String(u.followUp||"").replace(/\n/g,"\\n"))}')">Bearbeiten</button>
- <button class="secondary"onclick="deleteCampusEntry('classTeamUpdates','${u.id}','Information')">Löschen</button>
+ <button class="secondary"style="padding:4px 10px;font-size:12px"onclick="openEditClassTeamUpdateForm('${u.id}','${esc(String(u.date||"").replace(/\n/g,"\\n"))}','${esc(u.type||"info")}','${esc(String(u.title||"").replace(/\n/g,"\\n"))}','${esc(String(u.text||"").replace(/\n/g,"\\n"))}','${esc(String(u.followUp||"").replace(/\n/g,"\\n"))}')">Bearbeiten</button>
+ <button class="secondary"style="padding:4px 10px;font-size:12px"onclick="deleteCampusEntry('classTeamUpdates','${u.id}','Information')">Löschen</button>
  </div>
  </article>`;
  }).join("")||`<div class="empty">Noch keine Informationen dokumentiert.</div>`}
