@@ -1118,7 +1118,7 @@ async function renderKlassenteam(){
  <div class="card"style="margin-top:16px">
  <div class="kicker">TERMINE</div>
  <h2 style="margin-top:4px">Geburtstage im Klassenteam</h2>
- <div class="list">${birthdays.map(b=>{const c=personColor(b.uid);return`<div class="list-item"style="background:${c.bg};border-left:4px solid ${c.border};border-radius:8px;padding:10px 12px;margin-bottom:6px"><div><strong style="color:${c.text}">${esc(b.name)}</strong><small>${esc(b.date.toLocaleDateString("de-DE",{day:"2-digit",month:"long"}))}</small></div>${b.isToday?`<span class="pill green"> Heute!</span>`:`<span class="pill"style="background:${c.border};color:#fff">in ${b.days} Tagen</span>`}</div>`}).join("")||`<div class="empty">Noch keine Geburtstage eingetragen.</div>`}</div>
+ <div class="list">${birthdays.map(b=>{const c=personColor(b.uid);return`<div class="list-item"style="background:${c.bg};border-left:4px solid ${c.border};border-radius:8px;padding:10px 12px;margin-bottom:6px"><div><strong style="color:${c.text}">${esc(b.name)}</strong><small>${esc(b.date.toLocaleDateString("de-DE",{day:"2-digit",month:"long"}))}</small></div><div style="display:flex;align-items:center;gap:8px">${b.isToday?`<span class="pill green"> Heute!</span>`:`<span class="pill"style="background:${c.border};color:#fff">in ${b.days} Tagen</span>`}${(b.uid===currentUser.uid||isTeacher())?`<button type="button"class="secondary"style="padding:4px 8px"onclick="${b.uid===currentUser.uid?"removeBirthday()":`adminRemoveBirthday('${b.uid}')`}"title="Geburtstag entfernen">✕</button>`:""}</div></div>`}).join("")||`<div class="empty">Noch keine Geburtstage eingetragen.</div>`}</div>
  </div>
  ${footer()}`;
 }
@@ -8421,6 +8421,20 @@ async function removeBirthday(){
  }catch(e){console.error("Geburtstag löschen:",e);toast("Konnte nicht entfernt werden.")}
 }
 window.removeBirthday=removeBirthday;
+
+async function adminRemoveBirthday(uid){
+ if(!isTeacher()){toast("Nur Lehrkräfte können fremde Geburtstage entfernen.");return}
+ if(!confirm("Diesen Geburtstag wirklich entfernen?"))return;
+ try{
+ await updateDoc(doc(db,"users",uid),{birthday:"",updatedAt:serverTimestamp()});
+ toast("Geburtstag entfernt.");
+ await render();
+ }catch(e){
+ console.error("Geburtstag (fremd) löschen:",e);
+ toast(e?.code==="permission-denied"?"Firebase verweigert das Entfernen. Bitte die Firestore-Regeln prüfen.":"Konnte nicht entfernt werden.");
+ }
+}
+window.adminRemoveBirthday=adminRemoveBirthday;
 
 async function saveBirthday(){
  const val=$("birthdayInput")?.value||"";

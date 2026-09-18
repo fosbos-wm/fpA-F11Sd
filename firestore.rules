@@ -58,7 +58,7 @@ service cloud.firestore {
           && resource.data.role == 'student'
           && request.resource.data.role == 'student'
           && request.resource.data.diff(resource.data).affectedKeys()
-               .hasOnly(['status', 'approvedAt', 'approvedBy', 'updatedAt'])
+               .hasOnly(['status', 'approvedAt', 'approvedBy', 'updatedAt', 'birthday'])
         )
         || (
           isSelf(uid)
