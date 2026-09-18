@@ -2111,26 +2111,87 @@ window.openPraktikumsbesucheUebersicht=openPraktikumsbesucheUebersicht;
 async function renderPraktikumsbesuche(){
  const besuche=await getPraktikumsbesuche();
  const geplant=besuche.filter(b=>b.datum).length;
- return`${pageHead("FPA · TERMINPLANUNG","Praktikumsbesuche",`Route und Termine für die Besuche in den Praktikumsstellen. ${geplant} von ${besuche.length} Terminen bereits festgelegt.`,isTeacher()?`<button class="primary"onclick="openPraktikumsbesuchForm()">＋ Praktikumsstelle</button>`:"")}
- ${!besuche.length?`<div class="empty"><strong>Noch keine Praktikumsstellen eingetragen.</strong>${isTeacher()?"Sobald die Adressliste vorliegt, wird hier eine sinnvolle Route (nahe beieinanderliegende Orte hintereinander) vorgeschlagen – du musst dann nur noch Datum und Uhrzeit je Station eintragen.":"Die Lehrkraft plant die Besuchsroute – hier erscheinen die Termine, sobald sie feststehen."}</div>`
+ return`${pageHead("FPA · TERMINPLANUNG","Praktikumsbesuche",`Route und Termine für die Besuche in den Praktikumsstellen. ${geplant} von ${besuche.length} Terminen bereits festgelegt.`,isTeacher()?`<button class="primary"onclick="openPraktikumsbesuchForm()">＋ Praktikumsstelle</button> <button class="secondary"onclick="openPraktikumsbesucheImport()"> Route importieren</button>`:"")}
+ ${!besuche.length?`<div class="empty"><strong>Noch keine Praktikumsstellen eingetragen.</strong>${isTeacher()?"Sobald die Adressliste vorliegt, wird hier eine sinnvolle Route (nahe beieinanderliegende Orte hintereinander) vorgeschlagen – du musst dann nur noch Uhrzeit je Station eintragen.":"Die Lehrkraft plant die Besuchsroute – hier erscheinen die Termine, sobald sie feststehen."}</div>`
  :`<div class="kicker"style="margin-bottom:10px">MEINE ROUTE · ${besuche.length} STATIONEN</div>
  <div class="pk-zeitstrahl">${besuche.map(b=>{
  const istMeins=!isTeacher()&&(b.schueler||"").toLowerCase().trim()===(profile?.displayName||"").toLowerCase().trim();
- return`<div class="pk-node"${isTeacher()?`onclick="openPraktikumsbesuchForm('${b.id}')"style="cursor:pointer;border-left:4px solid #4a90d9"`:`style="border-left:4px solid ${istMeins?"#3fa66a":"#e2eaf0"}"`}>
- <div class="pk-summary"style="cursor:${isTeacher()?"pointer":"default"}">
+ return`<div class="pk-node"style="border-left:4px solid ${isTeacher()?"#4a90d9":istMeins?"#3fa66a":"#e2eaf0"}">
+ <div class="pk-summary"style="cursor:default">
  <span class="pk-icon">${b.reihenfolge}.</span>
  <div class="pk-info">
  <strong>${esc(b.schueler)} ${istMeins?" (das bist du)":""}</strong>
  <small>${esc(b.betrieb)}${b.adresse?` · ${esc(b.adresse)}`:""}</small>
- <small>${b.datum?` ${esc(fmtDateOnly(b.datum))}${b.uhrzeit?", "+esc(b.uhrzeit)+" Uhr":""}`:" Termin noch nicht festgelegt"}</small>
+ ${!isTeacher()?`<small>${b.datum?` ${esc(fmtDateOnly(b.datum))}${b.uhrzeit?", "+esc(b.uhrzeit)+" Uhr":""}`:" Termin noch nicht festgelegt"}</small>`:""}
  ${b.notiz&&isTeacher()?`<small> ${esc(b.notiz)}</small>`:""}
  </div>
+ ${isTeacher()?`<button type="button"class="secondary"style="padding:4px 8px;font-size:11px"onclick="openPraktikumsbesuchForm('${b.id}')">Bearbeiten</button>`:""}
  </div>
+ ${isTeacher()?`<div style="display:flex;gap:8px;align-items:center;padding:0 12px 10px 40px;flex-wrap:wrap">
+ <input type="date"id="pbeDatumInline_${b.id}"value="${b.datum||""}"style="font-size:12px;padding:4px 6px">
+ <input type="time"id="pbeUhrzeitInline_${b.id}"value="${b.uhrzeit||""}"style="font-size:12px;padding:4px 6px">
+ <button type="button"class="secondary"style="padding:4px 8px;font-size:11px"onclick="saveBesuchTermin('${b.id}')">Termin speichern</button>
+ </div>`:""}
  </div>`;
  }).join("")}</div>`}
  ${footer()}`;
 }
 window.renderPraktikumsbesuche=renderPraktikumsbesuche;
+async function saveBesuchTermin(id){
+ if(!isTeacher()){toast("Nur Lehrkräfte können Termine eintragen.");return}
+ const datum=$(`pbeDatumInline_${id}`)?.value||"";
+ const uhrzeit=$(`pbeUhrzeitInline_${id}`)?.value||"";
+ try{
+ await updateDoc(doc(db,"praktikumsbesuche",id),{datum,uhrzeit,updatedAt:serverTimestamp()});
+ toast("Termin gespeichert.");
+ await render();
+ }catch(e){console.error("Termin speichern:",e);toast(e?.code==="permission-denied"?"Firebase verweigert das Speichern. Bitte die Firestore-Regeln prüfen.":"Konnte nicht gespeichert werden.");}
+}
+window.saveBesuchTermin=saveBesuchTermin;
+// Massen-Import: eine fertig sortierte Route (eine Zeile je Station,
+// "Schüler;Betrieb;Adresse") wird auf einmal angelegt – Reihenfolge
+// ergibt sich aus der Zeilenreihenfolge. Bestehende Einträge werden
+// vorher gelöscht, damit ein erneuter Import nichts verdoppelt.
+function openPraktikumsbesucheImport(){
+ if(!isTeacher()){toast("Nur Lehrkräfte können importieren.");return}
+ modal(`<button class="modal-close"onclick="closeModal()">×</button>
+ <div class="kicker">PRAKTIKUMSBESUCHE · IMPORT</div>
+ <h2>Route importieren</h2>
+ <p style="font-size:12px;color:var(--muted)">Eine Zeile pro Station, in der gewünschten Reihenfolge: <code>Schüler;Betrieb;Adresse</code>. Bestehende Einträge werden dabei ersetzt.</p>
+ <div class="form">
+ <textarea id="pbImportText"rows="12"placeholder="Max Mustermann;Kita Sonnenschein;Musterstr. 1, 82362 Weilheim
+Lena Beispiel;AWO Seniorenzentrum;Beispielweg 5, 82362 Weilheim"></textarea>
+ <div class="form-actions">
+ <button class="primary"onclick="importPraktikumsbesuche()">Importieren</button>
+ <button class="secondary"onclick="closeModal()">Abbrechen</button>
+ </div>
+ </div>
+ `);
+}
+window.openPraktikumsbesucheImport=openPraktikumsbesucheImport;
+async function importPraktikumsbesuche(){
+ if(!isTeacher()){toast("Nur Lehrkräfte können importieren.");return}
+ const text=$("pbImportText")?.value||"";
+ const zeilen=text.split("\n").map(z=>z.trim()).filter(Boolean);
+ if(!zeilen.length){toast("Bitte mindestens eine Zeile eingeben.");return}
+ try{
+ const bestehend=await getPraktikumsbesuche();
+ for(const b of bestehend)await deleteDoc(doc(db,"praktikumsbesuche",b.id));
+ let reihenfolge=1;
+ for(const zeile of zeilen){
+ const[schueler,betrieb,adresse]=zeile.split(";").map(t=>(t||"").trim());
+ if(!schueler||!betrieb)continue;
+ await addDoc(collection(db,"praktikumsbesuche"),{
+ reihenfolge,schueler,betrieb,adresse:adresse||"",datum:"",uhrzeit:"",notiz:"",createdAt:serverTimestamp(),updatedAt:serverTimestamp()
+ });
+ reihenfolge++;
+ }
+ toast(`${reihenfolge-1} Stationen importiert.`);
+ closeModal();
+ await render();
+ }catch(e){console.error("Import fehlgeschlagen:",e);toast(e?.code==="permission-denied"?"Firebase verweigert das Speichern. Bitte die Firestore-Regeln prüfen.":"Import fehlgeschlagen.");}
+}
+window.importPraktikumsbesuche=importPraktikumsbesuche;
 
 // Schnell-Ampel für die Kurzdurchsicht: setzt nur die Farbe, ohne die vier
 // Detailkriterien abzufragen. Lässt bereits gesetzte Kriterien unangetastet.
@@ -7831,7 +7892,7 @@ async function renderPraktikum(){
  <button type="button"class="card pk-kz"onclick="openFPAProjects()">
  <strong>${projects.length}</strong><small> Projekte in der Praxis</small>
  </button>
- <button type="button"class="card pk-kz"onclick="go('ki')">
+ <button type="button"class="card pk-kz"onclick="openKIChallengesLibrary()">
  <strong>${challenges.length}</strong><small> KI-Challenges</small>
  </button>
  </div>
@@ -10025,30 +10086,13 @@ async function render(){
  const seq=++__campusRenderSeq;
  const p=location.hash.replace("#","")||"start";
  const pages={
- start:renderStart,klassenteam:renderKlassenteam,kompass:renderKompass,lernwerkstatt:renderLernwerkstatt,"ki-lernen":renderKILernen,
- faecher:renderFaecherUebersicht,fach:renderFachDetail,
- ressourcen:renderRessourcenRoute,lernpfad:renderLernpfadRoute,forum:renderForum,"forum-board":renderForumBoard,"forum-nachrichten":renderForumMessages,
- pinnwand:renderPinnwandUebersicht,"pinnwand-board":renderPinnwandBoard,
- kollaboration:renderKollaborationsTools,
- wortwolke:renderWortwolkeUebersicht,"wortwolke-board":renderWortwolkeBoard,
- kanban:renderKanbanUebersicht,"kanban-board":renderKanbanBoard,
- terminfindung:renderTerminfindungUebersicht,"terminfindung-board":renderTerminfindungBoard,
- teamgesucht:renderTeamgesuchtUebersicht,
- checkliste:renderChecklisteUebersicht,"checkliste-board":renderChecklisteBoard,
- ampel:renderAmpelUebersicht,"ampel-board":renderAmpelBoard,
- umfrage:renderUmfrageUebersicht,"umfrage-board":renderUmfrageBoard,
- zufallspicker:renderZufallspicker,
- lernwerkzeuge:renderLernWerkzeuge,
- karteikarten:renderKarteikartenUebersicht,"karteikarten-board":renderKarteikartenBoard,"fokus-timer":renderFokusTimer,"uhr-timer":renderUhrTimer,
- glossar:renderGlossar,
- fachaufsatz:renderFachaufsatzUebersicht,"fachaufsatz-board":renderFachaufsatzBoard,
- projekte:renderProjekte,kompetenz:renderKompetenz,journal:renderLernjournalRoute,
- praktikum:renderPraktikum,praktikumsbesuche:renderPraktikumsbesuche,resilienz:renderResilienz,praxisfragen:renderPraxisFragen,fragenhilfe:renderFragenHilfe,
- praxisprojekte:renderPraxisProjekte,ki:renderKI,kalender:renderKalender,team:renderTeam,
- impulse:renderLernimpulse,lernstand:renderLernstand,
- kompetenzprofil:()=>modulePlaceholder("Kompetenzprofil"),methoden:renderLernmethoden,lernstrategien:renderLernstrategienTest,metakognition:renderMetakognition,
- lerncoaching:renderLerncoaching
+ start:renderStart,klassenteam:renderKlassenteam,
+ praktikum:renderPraktikum,praktikumsbesuche:renderPraktikumsbesuche,
+ kalender:renderKalender,team:renderTeam
  };
+ // Diese App zeigt bewusst nur den fpA-Anteil – alle anderen Routen (aus
+ // der F11Sb-Basis mitkopiert, aber hier nicht vorgesehen) leiten zur
+ // Startseite um, statt über die Adresszeile erreichbar zu sein.
  const fn=pages[p]||renderStart;
  document.querySelectorAll(".nav-link").forEach(a=>a.classList.toggle("active",
  a.dataset.page===p || (a.dataset.page==="forum" && p.startsWith("forum-"))));
