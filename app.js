@@ -2538,7 +2538,7 @@ verwaltest du Praktikumsphasen, Blockberichte und die Besuchstermine – alles r
 </div><div class="actions">${isTeacher()?`<button class="primary"onclick="openNewsForm()">＋ News veröffentlichen</button>`:""}<button class="secondary"onclick="go('praktikum')">fpA öffnen →</button><button class="secondary"onclick="go('praktikumsbesuche')">Praktikumsbesuche</button></div></section>
  <div class="grid grid-3">
  <div class="card card-compact"style="border-left:4px solid #4a90d9"><h3> Campus-News</h3><div class="list">${news.slice(0,3).map(p=>`<div
-class="list-item"><div><strong>${esc(p.title||p.text)}</strong>${p.title?`<small>${esc(p.text)} · ${fmtDate(p.createdAt)}</small>`:`<small>${fmtDate(p.createdAt)}</small>`}</div><div style="display:flex;align-items:center;gap:8px"><span class="pill">Info</span>${isAdmin()?`<button class="secondary"onclick="deleteNews('${p.id}')">Löschen</button>`:""}</div>
+class="list-item"><div><strong>${esc(p.title||p.text)}</strong>${p.title?`<small>${esc(p.text)} · ${fmtDate(p.createdAt)}</small>`:`<small>${fmtDate(p.createdAt)}</small>`}</div><div style="display:flex;align-items:center;gap:8px"><span class="pill">Info</span>${isTeacher()?`<button class="secondary"onclick="openEditNewsForm('${p.id}','${esc(String(p.title||"").replace(/\n/g,"\\n"))}','${esc(String(p.text||"").replace(/\n/g,"\\n"))}')">Bearbeiten</button>`:""}${isAdmin()?`<button class="secondary"onclick="deleteNews('${p.id}')">Löschen</button>`:""}</div>
 </div>`).join("")||`<div class="empty">Noch keine News.</div>`}</div></div>
  <div class="card card-compact"style="border-left:4px solid #9b59b6"><h3> Nächster Termin</h3><div class="list">${nextCalendar?`<div class="list-item"><div><strong>${esc(nextCalendar.title||nextCalendar.name||"Termin")}</strong><small>${esc(upcomingDateText)}${upcomingTime}</small></div><span class="pill green">Termin</span></div>`:`<div class="empty">Noch keine anstehenden Termine.</div>`}</div></div>
  <div class="card card-compact"style="border-left:4px solid #e0629e"><h3> Geburtstage</h3>${
@@ -8612,7 +8612,10 @@ async function renderTeam(){
  <div class="team-history-meta">Gepostet von ${esc(u.authorName||"Lehrkraft")}</div>
  <p class="team-history-text">${esc(u.text||"")}</p>
  ${u.followUp?`<div class="notice"style="margin-top:10px"><strong>Nächster Schritt / Vereinbarung</strong><p style="margin-bottom:0;white-space:pre-wrap">${esc(u.followUp)}</p></div>`:""}
- <div class="form-actions"style="margin-top:10px"><button class="secondary"onclick="deleteCampusEntry('classTeamUpdates','${u.id}','Information')">Löschen</button></div>
+ <div class="form-actions"style="margin-top:10px">
+ <button class="secondary"onclick="openEditClassTeamUpdateForm('${u.id}','${esc(String(u.date||"").replace(/\n/g,"\\n"))}','${esc(u.type||"info")}','${esc(String(u.title||"").replace(/\n/g,"\\n"))}','${esc(String(u.text||"").replace(/\n/g,"\\n"))}','${esc(String(u.followUp||"").replace(/\n/g,"\\n"))}')">Bearbeiten</button>
+ <button class="secondary"onclick="deleteCampusEntry('classTeamUpdates','${u.id}','Information')">Löschen</button>
+ </div>
  </article>`;
  }).join("")||`<div class="empty">Noch keine Informationen dokumentiert.</div>`}
  </div>
@@ -8669,6 +8672,41 @@ async function saveClassTeamUpdate(){
  closeModal();await render();toast("Information für das Klassenteam gespeichert.");
  }catch(e){console.error("Klassenteam speichern:",e);toast("Information konnte nicht gespeichert werden.");}
 }
+function openEditClassTeamUpdateForm(id,date,type,title,text,followUp){
+ if(!isTeacher()){toast("Nur Lehrkräfte können Informationen bearbeiten.");return}
+ modal(`<button class="modal-close"onclick="closeModal()">×</button>
+ <div class="kicker">LEHRKRÄFTE KLASSENTEAM · BEARBEITEN</div><h2>Information bearbeiten</h2>
+ <div class="form">
+ <label>Datum<input id="ctDate"type="date"value="${esc(date)}"></label>
+ <label>Art<select id="ctType">
+ <option value="info"${type==="info"?" selected":""}>Information</option><option value="vorkommnis"${type==="vorkommnis"?" selected":""}>Vorkommnis</option>
+ <option value="vereinbarung"${type==="vereinbarung"?" selected":""}>Vereinbarung</option><option value="beobachtung"${type==="beobachtung"?" selected":""}>Beobachtung</option>
+ <option value="wichtig"${type==="wichtig"?" selected":""}>Wichtig</option><option value="sonstiges"${type==="sonstiges"?" selected":""}>Sonstiges</option>
+ </select></label>
+ <label>Titel<input id="ctTitle"value="${esc(title)}"required></label>
+ <label>Information<textarea id="ctText"rows="6"required>${esc(text)}</textarea></label>
+ <div style="margin-top:-8px;margin-bottom:10px">${emojiPickerHTML("ctText","emojiPickerClassTeam")}</div>
+ <label>Nächster Schritt / Vereinbarung (optional)<textarea id="ctFollowUp"rows="3">${esc(followUp)}</textarea></label>
+ <div class="form-actions"><button class="secondary"onclick="closeModal()">Abbrechen</button>
+ <button class="primary"onclick="saveClassTeamUpdateEdit('${id}')">Speichern</button></div>
+ </div>`);
+}
+window.openEditClassTeamUpdateForm=openEditClassTeamUpdateForm;
+async function saveClassTeamUpdateEdit(id){
+ if(!isTeacher()){toast("Nur Lehrkräfte können Informationen bearbeiten.");return}
+ const title=$("ctTitle")?.value.trim()||"", body=$("ctText")?.value.trim()||"";
+ if(!title||!body){toast("Bitte Titel und Information ausfüllen.");return}
+ try{
+ await updateDoc(doc(db,"classTeamUpdates",id),{
+ date:$("ctDate")?.value||new Date().toISOString().slice(0,10),
+ type:$("ctType")?.value||"info",title,text:body,
+ followUp:$("ctFollowUp")?.value.trim()||"",
+ updatedAt:serverTimestamp()
+ });
+ closeModal();await render();toast("Information aktualisiert.");
+ }catch(e){console.error("Klassenteam bearbeiten:",e);toast(e?.code==="permission-denied"?"Firebase verweigert das Speichern. Bitte die Firestore-Regeln prüfen.":"Information konnte nicht gespeichert werden.");}
+}
+window.saveClassTeamUpdateEdit=saveClassTeamUpdateEdit;
 
 
 const LERNMETHODEN=[
@@ -10478,6 +10516,18 @@ async function addNews(){
  if(!title||!text){toast("Bitte Überschrift und News eingeben.");return}
  try{await addDoc(collection(db,"news"),{authorUid:currentUser.uid,authorName:profile?.displayName||currentUser?.email||"Lehrkraft",title,text,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});closeModal();await render();toast("News veröffentlicht.")}catch(e){console.error(e);toast("News konnte nicht veröffentlicht werden.")}
 }
+function openEditNewsForm(id,title,text){
+ if(!isTeacher()){toast("Nur Lehrkräfte können News bearbeiten.");return}
+ modal(`<button class="modal-close"onclick="closeModal()">×</button><div class="kicker">CAMPUS-NEWS · BEARBEITEN</div><h2>News bearbeiten</h2><div class="form"><label>Überschrift<input id="newsTitle"value="${esc(title)}"required></label><label>News<textarea id="newsText"rows="6"required>${esc(text)}</textarea></label><div style="margin-top:-8px;margin-bottom:10px">${emojiPickerHTML("newsText","emojiPickerNews")}</div><div class="form-actions"><button class="secondary"onclick="closeModal()">Abbrechen</button><button class="primary"onclick="saveNewsEdit('${id}')">Speichern</button></div></div>`);
+}
+window.openEditNewsForm=openEditNewsForm;
+async function saveNewsEdit(id){
+ if(!isTeacher()){toast("Nur Lehrkräfte können News bearbeiten.");return}
+ const title=$("newsTitle")?.value.trim()||"",text=$("newsText")?.value.trim()||"";
+ if(!title||!text){toast("Bitte Überschrift und News eingeben.");return}
+ try{await updateDoc(doc(db,"news",id),{title,text,updatedAt:serverTimestamp()});closeModal();await render();toast("News aktualisiert.")}catch(e){console.error(e);toast(e?.code==="permission-denied"?"Firebase verweigert das Speichern. Bitte die Firestore-Regeln prüfen.":"News konnte nicht gespeichert werden.")}
+}
+window.saveNewsEdit=saveNewsEdit;
 
 // ---- Emoji-Picker (wiederverwendbar für Forum-Beiträge und Nachrichten) --
 const EMOJI_PICKER_LISTE=["😀","😂","🥰","😅","😉","🙂","😊","😍","🤔","😮","😢","😡","👍","👎","❤️","🔥","🎉","👏","🙏","💡","✅","❌","🤝","🚀","📚","🎓","😴","🥳","💪","👀"];
