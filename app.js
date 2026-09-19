@@ -769,10 +769,15 @@ function fmtDateOnly(v){
 }
 // Abgabetermin für Blockberichte: immer der Tag vor Ende des jeweiligen
 // Praktikumsblocks (unabhängig vom Wochentag) – so wie mit der Klasse besprochen.
+// WICHTIG: Datum in LOKALER Zeit zusammenbauen (nicht toISOString, das liefert
+// UTC und würde in deutscher Zeitzone (UTC+1/+2) einen Tag zurückspringen).
 function letzterDonnerstagVorOrAm(dateStr){
  const d=new Date(dateStr+"T00:00:00");
  d.setDate(d.getDate()-1);
- return d.toISOString().slice(0,10);
+ const jahr=d.getFullYear();
+ const monat=String(d.getMonth()+1).padStart(2,"0");
+ const tag=String(d.getDate()).padStart(2,"0");
+ return `${jahr}-${monat}-${tag}`;
 }
 function cleanDateInput(v){return v||"—"}
 
