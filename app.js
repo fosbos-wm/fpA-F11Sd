@@ -63,6 +63,11 @@ function showImpressum(){
 
  <p><strong>Redaktionell verantwortlich</strong><br>Christian Dick, OStD</p>
 
+ <p><strong>Datenschutzbeauftragter der Schule</strong><br>
+ Niklas Hilber<br>
+ E-Mail: <a href="mailto:niklas.hilber@schule.bayern.de">niklas.hilber@schule.bayern.de</a><br>
+ Bei Fragen oder Anliegen zum Datenschutz (auch zu dieser App) kannst du dich direkt an ihn wenden.</p>
+
  <p><strong>Verbraucherstreitbeilegung / Universalschlichtungsstelle</strong><br>
  Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
 
@@ -8232,8 +8237,6 @@ async function exportCampusCalendarICS(){
  if(!events.length){
  try{events=await getCollection("calendar","date",false)}catch(e){console.error(e)}
  }
- let birthdayEvents=[];
- try{birthdayEvents=await getBirthdayEvents()}catch(e){console.error(e)}
  const ferienZeitraeume=[
  ["2026-08-03","2026-09-14","Sommerferien 2026"],
  ["2026-11-02","2026-11-06","Herbstferien / unterrichtsfreie Tage um Allerheiligen"],
@@ -8250,7 +8253,7 @@ async function exportCampusCalendarICS(){
  {start:"2027-05-06",title:"Christi Himmelfahrt",description:"Gesetzlicher Feiertag in Bayern."},
  {start:"2027-05-17",title:"Pfingstmontag",description:"Gesetzlicher Feiertag in Bayern."}
  ];
- downloadICS([...events,...birthdayEvents,...ferienRangeEvents,...feiertagEventsICS],"campuskalender.ics","F11Sd Kalender");
+ downloadICS([...events,...ferienRangeEvents,...feiertagEventsICS],"campuskalender.ics","F11Sd Kalender");
  toast("Kalender wird heruntergeladen – Datei öffnen, um sie zum Handy-Kalender hinzuzufügen.");
  }catch(e){console.error("Kalender-Export:",e);toast("Der Kalender konnte nicht exportiert werden.")}
 }
@@ -8282,7 +8285,6 @@ async function renderKalender(){
  referat:{label:"Referat",className:"cal-yellow"},
  praesentation:{label:"Präsentation",className:"cal-purple"},
  sonstiges:{label:"Sonstiger Termin",className:"cal-grey"},
- geburtstag:{label:"Geburtstag",className:"cal-birthday"},
  ferien:{label:"Schulferien Bayern",className:"cal-holiday"},
  fpa:{label:"fpA-Abgabe",className:"cal-gold"},
  feiertag:{label:"Gesetzlicher Feiertag",className:"cal-teal"}
@@ -8318,9 +8320,7 @@ async function renderKalender(){
  {start:"2027-05-06",type:"feiertag",title:"Christi Himmelfahrt",description:"Gesetzlicher Feiertag in Bayern."},
  {start:"2027-05-17",type:"feiertag",title:"Pfingstmontag",description:"Gesetzlicher Feiertag in Bayern."}
  ];
- let birthdayEvents=[];
- try{birthdayEvents=await getBirthdayEvents()}catch(e){console.error("Kalender Geburtstage:",e)}
- events=[...events,...birthdayEvents,...ferienEvents,...feiertagEvents];
+ events=[...events,...ferienEvents,...feiertagEvents];
 
  const normalizeType=e=>{
  const raw=String(e?.type||e?.eventType||e?.category||"sonstiges").toLowerCase().trim();
@@ -8370,13 +8370,12 @@ async function renderKalender(){
 
  window._campusCalendarEvents=events;
  const addButton=isTeacher()?'<button id="calendarAddBtn"class="primary"type="button">＋ Termin eintragen</button>':"";
- const birthdayButton='<button id="calendarBirthdayBtn"class="secondary"type="button"> Meinen Geburtstag eintragen</button>';
  const exportButton='<button class="secondary"type="button"onclick="exportCampusCalendarICS()"> Kalender aufs Handy exportieren</button>';
  const legend=Object.entries(typeMeta).map(([k,v])=>
  `<span class="cal-legend-item"><i class="cal-legend-dot ${v.className}"></i>${esc(v.label)}</span>`
  ).join("");
 
- const html=`${pageHead("ORGANISATION","fpA Kalender","Das Schuljahr 26/27 auf einen Blick. Termine sind je nach Terminart farblich gekennzeichnet.",`${addButton}${birthdayButton}${exportButton}`)}
+ const html=`${pageHead("ORGANISATION","fpA Kalender","Das Schuljahr 26/27 auf einen Blick. Termine sind je nach Terminart farblich gekennzeichnet.",`${addButton}${exportButton}`)}
  <div class="card"style="margin-bottom:16px;border-left:4px solid #4a90d9">
  <strong style="font-size:16px">Willkommen, 11Sd! </strong>
  <p style="margin:6px 0 0;color:var(--muted)">Hier findest du alle Termine rund um euer Praktikum – Abgabefristen, Feiertage, Ferien und Geburtstage auf einen Blick.</p>
@@ -8428,7 +8427,6 @@ async function renderKalender(){
  <div class="cal-months">${months.map(x=>monthHTML(x.y,x.m,x.name)).join("")}</div>${footer()}`;
  setTimeout(()=>{
  const b=$("calendarAddBtn");if(b)b.addEventListener("click",openCalendarForm);
- const bb=$("calendarBirthdayBtn");if(bb)bb.addEventListener("click",openBirthdayForm);
  },0);
  return html;
 }
@@ -8555,7 +8553,6 @@ function calendarTypeMeta(e){
  referat:{label:"Referat",className:"cal-yellow"},
  praesentation:{label:"Präsentation",className:"cal-purple"},
  sonstiges:{label:"Sonstiger Termin",className:"cal-grey"},
- geburtstag:{label:"Geburtstag",className:"cal-birthday"},
  ferien:{label:"Schulferien Bayern",className:"cal-holiday"},
  fpa:{label:"fpA-Abgabe",className:"cal-gold"},
  feiertag:{label:"Gesetzlicher Feiertag",className:"cal-teal"}
