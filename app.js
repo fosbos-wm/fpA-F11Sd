@@ -676,7 +676,7 @@ async function renderLernjournalRoute(){
 }
 
 function moduleError(title,file,error){
- return`${pageHead("CAMPUS-MODUL",title,"Das einzelne Modul konnte nicht geladen werden.",`<button class="secondary"onclick="go('start')">← Startseite</button>`)}
+ return`${pageHead("CAMPUS-MODUL",title,"Das einzelne Modul konnte nicht geladen werden.",`<button class="secondary"onclick="go('praktikum')">← fpA</button>`)}
  <div class="card">
  <h3>Die Campus-App selbst funktioniert.</h3>
  <p>Nur dieses Modul ist momentan nicht erreichbar.</p>
@@ -7913,8 +7913,9 @@ async function renderPraktikum(){
  </div>
  </details>
 
- <div class="kicker"style="margin:26px 0 8px">BEREICH 2 · KI-INNOVATIONSPARTNERSCHAFTEN</div>
- <div class="ki-grid">
+ <details class="noten-collapsible">
+ <summary>BEREICH 2 · KI-INNOVATIONSPARTNERSCHAFTEN</summary>
+ <div class="ki-grid"style="margin-top:8px">
  <div class="card ki-card"style="background:#fff;border:2px solid #1688cf">
  <div class="ki-step">1</div>
  <h2>Praxisproblem<br>Herausforderungen im Praktikumsbetrieb</h2>
@@ -7938,6 +7939,7 @@ async function renderPraktikum(){
  <div class="ki-action"><span class="pill">${results.length} Ergebnisse</span><span class="pill">Öffnen →</span></div>
  </button>
  </div>
+ </details>
  ${footer()}`;
 }
 
@@ -10142,16 +10144,15 @@ async function render(){
  if(liveUnsubHeimat){liveUnsubHeimat();liveUnsubHeimat=null;}
  if(liveUnsubMiniKalender){liveUnsubMiniKalender();liveUnsubMiniKalender=null;}
  const seq=++__campusRenderSeq;
- const p=location.hash.replace("#","")||"start";
+ const p=location.hash.replace("#","")||"praktikum";
  const pages={
- start:renderStart,klassenteam:renderKlassenteam,
  praktikum:renderPraktikum,praktikumsbesuche:renderPraktikumsbesuche,
  kalender:renderKalender
  };
  // Diese App zeigt bewusst nur den fpA-Anteil – alle anderen Routen (aus
- // der F11Sb-Basis mitkopiert, aber hier nicht vorgesehen) leiten zur
- // Startseite um, statt über die Adresszeile erreichbar zu sein.
- const fn=pages[p]||renderStart;
+ // der F11Sb-Basis mitkopiert, aber hier nicht vorgesehen) leiten zu fpA
+ // um, statt über die Adresszeile erreichbar zu sein.
+ const fn=pages[p]||renderPraktikum;
  document.querySelectorAll(".nav-link").forEach(a=>a.classList.toggle("active",
  a.dataset.page===p || (a.dataset.page==="forum" && p.startsWith("forum-"))));
  const content=$("content");
@@ -10227,7 +10228,7 @@ async function render(){
  }catch(e){
  if(seq!==__campusRenderSeq)return;
  console.error("Campus-Seitenfehler:",e);
- content.innerHTML=`<div class="card"><h3>Die Seite konnte nicht geladen werden.</h3><p>${esc(e?.message||"Unbekannter Fehler")}</p><button class="primary"onclick="go('start')">← Zur Startseite</button></div>`;
+ content.innerHTML=`<div class="card"><h3>Die Seite konnte nicht geladen werden.</h3><p>${esc(e?.message||"Unbekannter Fehler")}</p><button class="primary"onclick="go('praktikum')">← Zu fpA</button></div>`;
  window.scrollTo(0,0);
  }
  updateTeacherTeamNav();
@@ -10235,7 +10236,7 @@ async function render(){
 }
 
 function modulePlaceholder(title){
- return`${pageHead("CAMPUS-MODUL",title,"Dieser Bereich ist in der Master-Struktur vorbereitet.",`<button class="secondary"onclick="go('start')">← Startseite</button>`)}
+ return`${pageHead("CAMPUS-MODUL",title,"Dieser Bereich ist in der Master-Struktur vorbereitet.",`<button class="secondary"onclick="go('praktikum')">← fpA</button>`)}
  <div class="card"><span class="badge"> VORBEREITET</span><h2>${title}</h2><p>Dieser Bereich wird später als eigenes Modul
 entwickelt. Die übrige Campus-App bleibt dabei unverändert.</p></div>${footer()}`;
 }
@@ -10505,7 +10506,7 @@ window.CampusFirebase.modal=modal;
 window.CampusFirebase.toast=toast;
 
 window.addEventListener("hashchange",()=>render());
-window.go=p=>{const target=String(p||"start"); if(location.hash!=="#"+target) location.hash=target; else render();};
+window.go=p=>{const target=String(p||"praktikum"); if(location.hash!=="#"+target) location.hash=target; else render();};
 
 function openTaskForm(){
  modal(`<button class="modal-close"onclick="closeModal()">×</button><div class="kicker">CAMPUS-KOMPASS</div><h2>Neue
