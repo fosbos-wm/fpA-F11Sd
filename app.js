@@ -7838,8 +7838,8 @@ async function renderPraktikum(){
  ${isTeacher()?"":`<div class="pk-ampeln">${eigeneAmpeln}</div>`}
  </summary>
  <div class="pk-body">
- <small>Abgabe Blockbericht + Arbeitszeiten-Nachweis: <strong>${esc(fmtDateOnly(frist))}, 19 Uhr</strong></small>
- ${typen.some(t=>t.typ==="einschaetzung")?`<small>Abgabe Einschätzungsbogen: <strong>${esc(fmtDateOnly(einschaetzungFrist(p.id)))}, 19 Uhr</strong></small>`:""}
+ <small>Abgabe Blockbericht + Arbeitszeiten-Nachweis: <strong>${esc(fmtDateOnly(frist))}, 20 Uhr</strong></small>
+ ${typen.some(t=>t.typ==="einschaetzung")?`<small>Abgabe Einschätzungsbogen: <strong>${esc(fmtDateOnly(frist))}, 20 Uhr</strong></small>`:""}
  <button class="secondary"style="margin-top:8px;font-size:11px"onclick="${isTeacher()?`openLehrkraftPraktikumsUebersicht('${p.id}')`:`openPraktikumsblockDetail('${p.id}')`}">${isTeacher()?"Klassenübersicht öffnen":"Berichte hochladen/ansehen"} →</button>
  </div>
  </details>`;
