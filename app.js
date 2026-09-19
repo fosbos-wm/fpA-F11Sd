@@ -7802,7 +7802,7 @@ async function renderPraktikum(){
  .pk-node::before{content:"";position:absolute;left:-21px;top:20px;width:11px;height:11px;border-radius:50%;background:#fff;border:2.5px solid var(--blue);z-index:1}
  .pk-node.pk-laufend::before{border-color:#e8890c}
  .pk-node.pk-vorbei::before{border-color:#3fa66a}
- .pk-summary{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;list-style:none}
+ .pk-summary{display:flex;align-items:center;gap:10px;padding:12px 16px 12px 20px;cursor:pointer;list-style:none}
  .pk-summary::-webkit-details-marker{display:none}
  .pk-summary:hover{background:#f7fafc}
  .pk-icon{font-size:18px;flex:0 0 auto}
