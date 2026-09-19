@@ -6,7 +6,7 @@ let initializeApp, getAuth, onAuthStateChanged, createUserWithEmailAndPassword, 
  F11Sd MASTER – STABILE MODULREGISTRY
  Die Master-App selbst enthält keine Pflicht-Imports
  von Zusatzmodulen. Module werden erst beim Öffnen geladen.
- ========================================================= */ const CAMPUS_MODULES={ lernpfad:{label:"Persönlicher Lernpfad",route:"lernpfad",ready:true}, lernressourcen:{label:"Lernressourcen",route:"ressourcen",ready:true}, lernjournal:{label:"Lernjournal",route:"journal",ready:true}, lernmethoden:{label:"Lernmethoden",route:"methoden",ready:true}, lernimpulse:{label:"Lernimpulse",route:"impulse",ready:false}, lernstand:{label:"Lernstandsmessung",route:"lernstand",ready:true}, lerncoaching:{label:"Lerncoaching",route:"lerncoaching",ready:false}, resilienz:{label:"Resilienz & Respressi",route:"resilienz",ready:false}, kompetenz:{label:"Kompetenzwerkstatt",route:"kompetenz",ready:true}, forum:{label:"Campus-Forum",route:"forum",ready:true}, pinnwand:{label:"Pinnwand",route:"pinnwand",ready:true}, kollaboration:{label:"Tools für Zusammenarbeit",route:"kollaboration",ready:true}, wortwolke:{label:"Wortwolke",route:"wortwolke",ready:true}, kanban:{label:"Kanban-Board",route:"kanban",ready:true}, terminfindung:{label:"Terminfindung",route:"terminfindung",ready:true}, teamgesucht:{label:"Team gesucht",route:"teamgesucht",ready:true}, checkliste:{label:"Gemeinsame Checkliste",route:"checkliste",ready:true}, ampel:{label:"Verständnis-Ampel",route:"ampel",ready:true}, umfrage:{label:"Live-Umfrage",route:"umfrage",ready:true}, zufallspicker:{label:"Wer ist dran?",route:"zufallspicker",ready:true}, lernwerkzeuge:{label:"Lern-Werkzeuge",route:"lernwerkzeuge",ready:true}, karteikarten:{label:"Karteikarten",route:"karteikarten",ready:true},"fokus-timer":{label:"Fokus-Timer",route:"fokus-timer",ready:true}, glossar:{label:"Glossar",route:"glossar",ready:true}, projekte:{label:"Projekte",route:"projekte",ready:true}, praxis:{label:"fpA",route:"praktikum",ready:true}, ki:{label:"KI-Innovationslabor",route:"ki",ready:true}, kalender:{label:"Campus-Kalender",route:"kalender",ready:true}, kompetenzprofil:{label:"Kompetenzprofil",route:"kompetenzprofil",ready:false}, team:{label:"Lehrkräfte Klassenteam",route:"team",ready:true} }; const configReady = !Object.values(firebaseConfig).some(v => String(v).includes("HIER_") || String(v).includes("DEIN-PROJEKT")); let app=null, auth=null, db=null; const $=id=>document.getElementById(id); const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+ ========================================================= */ const CAMPUS_MODULES={ lernpfad:{label:"Persönlicher Lernpfad",route:"lernpfad",ready:true}, lernressourcen:{label:"Lernressourcen",route:"ressourcen",ready:true}, lernjournal:{label:"Lernjournal",route:"journal",ready:true}, lernmethoden:{label:"Lernmethoden",route:"methoden",ready:true}, lernimpulse:{label:"Lernimpulse",route:"impulse",ready:false}, lernstand:{label:"Lernstandsmessung",route:"lernstand",ready:true}, lerncoaching:{label:"Lerncoaching",route:"lerncoaching",ready:false}, resilienz:{label:"Resilienz & Respressi",route:"resilienz",ready:false}, kompetenz:{label:"Kompetenzwerkstatt",route:"kompetenz",ready:true}, forum:{label:"Campus-Forum",route:"forum",ready:true}, pinnwand:{label:"Pinnwand",route:"pinnwand",ready:true}, kollaboration:{label:"Tools für Zusammenarbeit",route:"kollaboration",ready:true}, wortwolke:{label:"Wortwolke",route:"wortwolke",ready:true}, kanban:{label:"Kanban-Board",route:"kanban",ready:true}, terminfindung:{label:"Terminfindung",route:"terminfindung",ready:true}, teamgesucht:{label:"Team gesucht",route:"teamgesucht",ready:true}, checkliste:{label:"Gemeinsame Checkliste",route:"checkliste",ready:true}, ampel:{label:"Verständnis-Ampel",route:"ampel",ready:true}, umfrage:{label:"Live-Umfrage",route:"umfrage",ready:true}, zufallspicker:{label:"Wer ist dran?",route:"zufallspicker",ready:true}, lernwerkzeuge:{label:"Lern-Werkzeuge",route:"lernwerkzeuge",ready:true}, karteikarten:{label:"Karteikarten",route:"karteikarten",ready:true},"fokus-timer":{label:"Fokus-Timer",route:"fokus-timer",ready:true}, glossar:{label:"Glossar",route:"glossar",ready:true}, projekte:{label:"Projekte",route:"projekte",ready:true}, praxis:{label:"fpA",route:"praktikum",ready:true}, ki:{label:"KI-Innovationslabor",route:"ki",ready:true}, kalender:{label:"Kalender & Termine",route:"kalender",ready:true}, kompetenzprofil:{label:"Kompetenzprofil",route:"kompetenzprofil",ready:false}, team:{label:"Lehrkräfte Klassenteam",route:"team",ready:true} }; const configReady = !Object.values(firebaseConfig).some(v => String(v).includes("HIER_") || String(v).includes("DEIN-PROJEKT")); let app=null, auth=null, db=null; const $=id=>document.getElementById(id); const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 const statusLabel={green:"Auf Kurs",yellow:"Klärungsbedarf",red:"Handlungsbedarf"};
 const labels={question:"Frage",info:"Info",idea:"Idee",project:"Projekt",practice:"Praxis"};
 let currentUser=null, profile=null, unsubscribers=[];
@@ -681,7 +681,7 @@ async function renderLernjournalRoute(){
 }
 
 function moduleError(title,file,error){
- return`${pageHead("CAMPUS-MODUL",title,"Das einzelne Modul konnte nicht geladen werden.",`<button class="secondary"onclick="go('kalender')">← fpA Kalender</button>`)}
+ return`${pageHead("CAMPUS-MODUL",title,"Das einzelne Modul konnte nicht geladen werden.",`<button class="secondary"onclick="go('kalender')">← Kalender & Termine</button>`)}
  <div class="card">
  <h3>Die Campus-App selbst funktioniert.</h3>
  <p>Nur dieses Modul ist momentan nicht erreichbar.</p>
@@ -2118,26 +2118,50 @@ async function renderPraktikumsbesuche(){
  const geplant=besuche.filter(b=>b.datum).length;
  return`${pageHead("FPA · TERMINPLANUNG","Praktikumsbesuche",`Route und Termine für die Besuche in den Praktikumsstellen. ${geplant} von ${besuche.length} Terminen bereits festgelegt.`,isTeacher()?`<button class="primary"onclick="openPraktikumsbesuchForm()">＋ Praktikumsstelle</button> <button class="secondary"onclick="openPraktikumsbesucheImport()"> Route importieren</button>`:"")}
  ${!besuche.length?`<div class="empty"><strong>Noch keine Praktikumsstellen eingetragen.</strong>${isTeacher()?"Sobald die Adressliste vorliegt, wird hier eine sinnvolle Route (nahe beieinanderliegende Orte hintereinander) vorgeschlagen – du musst dann nur noch Uhrzeit je Station eintragen.":"Die Lehrkraft plant die Besuchsroute – hier erscheinen die Termine, sobald sie feststehen."}</div>`
- :`<div class="kicker"style="margin-bottom:10px">MEINE ROUTE · ${besuche.length} STATIONEN</div>
- <style>.route-liste .pk-summary{padding-left:34px}</style>
- <div class="pk-zeitstrahl route-liste">${besuche.map(b=>{
+ :`<div class="kicker"style="margin-bottom:12px">MEINE ROUTE · ${besuche.length} STATIONEN</div>
+ <style>
+ .route-list{position:relative;margin-top:4px}
+ .route-item{position:relative;display:flex;gap:14px;padding-bottom:18px}
+ .route-item:last-child{padding-bottom:0}
+ .route-item:not(:last-child)::before{content:"";position:absolute;left:17px;top:36px;bottom:0;width:2px;background:var(--line,#e2eaf0)}
+ .route-num{flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:#fff;border:2px solid var(--line,#dbe4ea);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--muted,#65758a);position:relative;z-index:1}
+ .route-item--mine .route-num{border-color:#3fa66a;background:#eafaf0;color:#2f8a56}
+ .route-item--teacher .route-num{border-color:#4a90d9;background:#eaf3fc;color:#2f6fb0}
+ .route-card{flex:1;min-width:0;background:#fff;border:1px solid var(--line,#e2eaf0);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+ .route-item--mine .route-card{border-color:#bfe3cd;background:#f6fbf8}
+ .route-name-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+ .route-name{font-weight:700;font-size:15px;color:var(--ink,#1c2b39)}
+ .route-mine-pill{display:inline-block;background:#3fa66a;color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:999px;padding:2px 9px}
+ .route-org{color:var(--muted,#65758a);font-size:13px;margin-top:3px;line-height:1.4}
+ .route-meta-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:10px}
+ .route-time-pill{display:inline-flex;align-items:center;gap:5px;background:#eef3f8;color:#2c3e50;border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:600}
+ .route-time-pill--open{background:#f4f0e0;color:#8a6d1d}
+ .route-note{margin-top:8px;font-size:12px;color:var(--muted,#65758a)}
+ .route-edit-row{display:flex;gap:8px;align-items:center;padding-top:12px;margin-top:12px;border-top:1px solid var(--line,#eef2f5);flex-wrap:wrap}
+ .route-edit-row input{font-size:12px;padding:5px 7px}
+ </style>
+ <div class="route-list">${besuche.map(b=>{
  const istMeins=!isTeacher()&&(b.schueler||"").toLowerCase().trim()===(profile?.displayName||"").toLowerCase().trim();
- return`<div class="pk-node"style="border-left:4px solid ${isTeacher()?"#4a90d9":istMeins?"#3fa66a":"#e2eaf0"}">
- <div class="pk-summary"style="cursor:default">
- <span class="pk-icon">${b.reihenfolge}.</span>
- <div class="pk-info">
- <strong>${esc(b.schueler)} ${istMeins?" (das bist du)":""}</strong>
- <small>${esc(b.betrieb)}${b.adresse?` · ${esc(b.adresse)}`:""}</small>
- ${!isTeacher()?`<small>${b.datum?` ${esc(fmtDateOnly(b.datum))}${b.uhrzeit?", "+esc(b.uhrzeit)+" Uhr":""}`:" Termin noch nicht festgelegt"}</small>`:""}
- ${b.notiz&&isTeacher()?`<small> ${esc(b.notiz)}</small>`:""}
+ const zeitLabel=b.datum?`${esc(fmtDateOnly(b.datum))}${b.uhrzeit?", "+esc(b.uhrzeit)+" Uhr":""}`:"Termin noch offen";
+ return`<div class="route-item${istMeins?" route-item--mine":""}${isTeacher()?" route-item--teacher":""}">
+ <div class="route-num">${b.reihenfolge}</div>
+ <div class="route-card">
+ <div class="route-name-row">
+ <span class="route-name">${esc(b.schueler)}</span>
+ ${istMeins?`<span class="route-mine-pill">DAS BIST DU</span>`:""}
+ ${isTeacher()?`<button type="button"class="secondary"style="margin-left:auto;padding:4px 10px;font-size:11px"onclick="openPraktikumsbesuchForm('${b.id}')">Bearbeiten</button>`:""}
  </div>
- ${isTeacher()?`<button type="button"class="secondary"style="padding:4px 8px;font-size:11px"onclick="openPraktikumsbesuchForm('${b.id}')">Bearbeiten</button>`:""}
+ <div class="route-org">${esc(b.betrieb)}${b.adresse?` · ${esc(b.adresse)}`:""}</div>
+ <div class="route-meta-row">
+ ${!isTeacher()?`<span class="route-time-pill${b.datum?"":" route-time-pill--open"}"> ${zeitLabel}</span>`:""}
  </div>
- ${isTeacher()?`<div style="display:flex;gap:8px;align-items:center;padding:0 12px 10px 54px;flex-wrap:wrap">
- <input type="date"id="pbeDatumInline_${b.id}"value="${b.datum||""}"style="font-size:12px;padding:4px 6px">
- <input type="time"id="pbeUhrzeitInline_${b.id}"value="${b.uhrzeit||""}"style="font-size:12px;padding:4px 6px">
- <button type="button"class="secondary"style="padding:4px 8px;font-size:11px"onclick="saveBesuchTermin('${b.id}')">Termin speichern</button>
+ ${b.notiz&&isTeacher()?`<div class="route-note"> ${esc(b.notiz)}</div>`:""}
+ ${isTeacher()?`<div class="route-edit-row">
+ <input type="date"id="pbeDatumInline_${b.id}"value="${b.datum||""}">
+ <input type="time"id="pbeUhrzeitInline_${b.id}"value="${b.uhrzeit||""}">
+ <button type="button"class="secondary"style="padding:4px 10px;font-size:11px"onclick="saveBesuchTermin('${b.id}')">Termin speichern</button>
  </div>`:""}
+ </div>
  </div>`;
  }).join("")}</div>`}
  ${footer()}`;
@@ -2584,7 +2608,7 @@ class="list-item"style="display:block"><strong style="display:block">${esc(p.tit
  ${tile(" ","Unser Klassenteam","Steckbriefe, Geburtstage und Klasseninfos.","klassenteam")}
  ${tile(" ","fpA","Praktikumsphasen, Blockberichte und Ampel-Übersicht.","praktikum")}
  ${tile(" ","Praktikumsbesuche","Route und Termine für die Betriebsbesuche.","praktikumsbesuche")}
- ${tile(" ","Campus-Kalender","Termine, Prüfungen und Schulferien.","kalender")}</div>
+ ${tile(" ","Kalender & Termine","Termine, Prüfungen und Schulferien.","kalender")}</div>
 </div>${footer()}`;
 }
 async function getRecentForumActivityCount(days){
@@ -8374,7 +8398,7 @@ async function renderKalender(){
  `<span class="cal-legend-item"><i class="cal-legend-dot ${v.className}"></i>${esc(v.label)}</span>`
  ).join("");
 
- const html=`${pageHead("ORGANISATION","fpA Kalender","Das Schuljahr 26/27 auf einen Blick. Termine sind je nach Terminart farblich gekennzeichnet.")}
+ const html=`${pageHead("ORGANISATION","Kalender & Termine","Das Schuljahr 26/27 auf einen Blick. Termine sind je nach Terminart farblich gekennzeichnet.")}
  <div class="card"style="margin-bottom:16px;border-left:4px solid #4a90d9">
  <strong style="font-size:16px">Willkommen, 11Sd! </strong>
  <p style="margin:6px 0 0;color:var(--muted)">Hier findest du alle Termine rund um euer Praktikum – Abgabefristen, Feiertage, Ferien und Geburtstage auf einen Blick.</p>
@@ -10238,7 +10262,7 @@ async function render(){
  }catch(e){
  if(seq!==__campusRenderSeq)return;
  console.error("Campus-Seitenfehler:",e);
- content.innerHTML=`<div class="card"><h3>Die Seite konnte nicht geladen werden.</h3><p>${esc(e?.message||"Unbekannter Fehler")}</p><button class="primary"onclick="go('kalender')">← Zum fpA Kalender</button></div>`;
+ content.innerHTML=`<div class="card"><h3>Die Seite konnte nicht geladen werden.</h3><p>${esc(e?.message||"Unbekannter Fehler")}</p><button class="primary"onclick="go('kalender')">← Zum Kalender & Termine</button></div>`;
  window.scrollTo(0,0);
  }
  updateTeacherTeamNav();
@@ -10246,7 +10270,7 @@ async function render(){
 }
 
 function modulePlaceholder(title){
- return`${pageHead("CAMPUS-MODUL",title,"Dieser Bereich ist in der Master-Struktur vorbereitet.",`<button class="secondary"onclick="go('kalender')">← fpA Kalender</button>`)}
+ return`${pageHead("CAMPUS-MODUL",title,"Dieser Bereich ist in der Master-Struktur vorbereitet.",`<button class="secondary"onclick="go('kalender')">← Kalender & Termine</button>`)}
  <div class="card"><span class="badge"> VORBEREITET</span><h2>${title}</h2><p>Dieser Bereich wird später als eigenes Modul
 entwickelt. Die übrige Campus-App bleibt dabei unverändert.</p></div>${footer()}`;
 }
