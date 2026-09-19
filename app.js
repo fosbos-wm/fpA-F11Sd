@@ -767,12 +767,11 @@ function fmtDateOnly(v){
  const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(v));
  return m?`${m[3]}.${m[2]}.${m[1]}`:String(v);
 }
-// Letzter Donnerstag am oder vor einem gegebenen Datum (für die
-// Blockberichte-Abgabetermine: letzter Donnerstag jedes Praktikumsblocks).
+// Abgabetermin für Blockberichte: immer der Tag vor Ende des jeweiligen
+// Praktikumsblocks (unabhängig vom Wochentag) – so wie mit der Klasse besprochen.
 function letzterDonnerstagVorOrAm(dateStr){
  const d=new Date(dateStr+"T00:00:00");
- const diff=(d.getDay()-4+7)%7; // Donnerstag = Tag 4
- d.setDate(d.getDate()-diff);
+ d.setDate(d.getDate()-1);
  return d.toISOString().slice(0,10);
 }
 function cleanDateInput(v){return v||"—"}
