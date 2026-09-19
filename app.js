@@ -2,8 +2,8 @@ let initializeApp, getAuth, onAuthStateChanged, createUserWithEmailAndPassword, 
  WICHTIG:
  Diese Werte werden nach dem Anlegen deiner Firebase-Web-App aus
  der Firebase Console hier eingesetzt.
-*/ const firebaseConfig = { apiKey: "AIzaSyBKRUQz7x0hA8_GxJ4qi-61veKrS3GQqCA", authDomain: "f11sb-62bae.firebaseapp.com", projectId: "f11sb-62bae", storageBucket: "f11sb-62bae.firebasestorage.app", messagingSenderId: "579105646323", appId: "1:579105646323:web:3bfb668a90cb37540e3986", measurementId: "G-20SRP6BE9K" }; /* =========================================================
- F11Sb MASTER – STABILE MODULREGISTRY
+*/ const firebaseConfig = { apiKey: "AIzaSyDAYIxVV8cZWJ2sYstlFn87mwuTP-PHYro", authDomain: "fpa-f11sd.firebaseapp.com", projectId: "fpa-f11sd", storageBucket: "fpa-f11sd.firebasestorage.app", messagingSenderId: "77457925254", appId: "1:77457925254:web:2ace3e7223155d1f209d07" }; /* =========================================================
+ F11Sd MASTER – STABILE MODULREGISTRY
  Die Master-App selbst enthält keine Pflicht-Imports
  von Zusatzmodulen. Module werden erst beim Öffnen geladen.
  ========================================================= */ const CAMPUS_MODULES={ lernpfad:{label:"Persönlicher Lernpfad",route:"lernpfad",ready:true}, lernressourcen:{label:"Lernressourcen",route:"ressourcen",ready:true}, lernjournal:{label:"Lernjournal",route:"journal",ready:true}, lernmethoden:{label:"Lernmethoden",route:"methoden",ready:true}, lernimpulse:{label:"Lernimpulse",route:"impulse",ready:false}, lernstand:{label:"Lernstandsmessung",route:"lernstand",ready:true}, lerncoaching:{label:"Lerncoaching",route:"lerncoaching",ready:false}, resilienz:{label:"Resilienz & Respressi",route:"resilienz",ready:false}, kompetenz:{label:"Kompetenzwerkstatt",route:"kompetenz",ready:true}, forum:{label:"Campus-Forum",route:"forum",ready:true}, pinnwand:{label:"Pinnwand",route:"pinnwand",ready:true}, kollaboration:{label:"Tools für Zusammenarbeit",route:"kollaboration",ready:true}, wortwolke:{label:"Wortwolke",route:"wortwolke",ready:true}, kanban:{label:"Kanban-Board",route:"kanban",ready:true}, terminfindung:{label:"Terminfindung",route:"terminfindung",ready:true}, teamgesucht:{label:"Team gesucht",route:"teamgesucht",ready:true}, checkliste:{label:"Gemeinsame Checkliste",route:"checkliste",ready:true}, ampel:{label:"Verständnis-Ampel",route:"ampel",ready:true}, umfrage:{label:"Live-Umfrage",route:"umfrage",ready:true}, zufallspicker:{label:"Wer ist dran?",route:"zufallspicker",ready:true}, lernwerkzeuge:{label:"Lern-Werkzeuge",route:"lernwerkzeuge",ready:true}, karteikarten:{label:"Karteikarten",route:"karteikarten",ready:true},"fokus-timer":{label:"Fokus-Timer",route:"fokus-timer",ready:true}, glossar:{label:"Glossar",route:"glossar",ready:true}, projekte:{label:"Projekte",route:"projekte",ready:true}, praxis:{label:"fpA",route:"praktikum",ready:true}, ki:{label:"KI-Innovationslabor",route:"ki",ready:true}, kalender:{label:"Campus-Kalender",route:"kalender",ready:true}, kompetenzprofil:{label:"Kompetenzprofil",route:"kompetenzprofil",ready:false}, team:{label:"Lehrkräfte Klassenteam",route:"team",ready:true} }; const configReady = !Object.values(firebaseConfig).some(v => String(v).includes("HIER_") || String(v).includes("DEIN-PROJEKT")); let app=null, auth=null, db=null; const $=id=>document.getElementById(id); const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
@@ -29,7 +29,7 @@ function modal(html){$("modal").innerHTML=html;$("modalBackdrop").hidden=false}
 function closeModal(){$("modalBackdrop").hidden=true}
 function pageHead(k,h,p,actions=""){return`<div class="page-head"><div><div class="kicker">${k}</div><h1>${h}</h1><p>${p}</p>
 </div><div class="actions">${actions}</div></div>`}
-function footer(){return`<div class="footer"><span>F11Sb 26/27 · FOSBOS Weilheim</span><span>Gemeinsam · offen ·
+function footer(){return`<div class="footer"><span>F11Sd 26/27 · FOSBOS Weilheim</span><span>Gemeinsam · offen ·
 respektvoll</span><span><button type="button"onclick="showImpressum()"style="background:none;border:none;padding:0;font:inherit;color:inherit;text-decoration:underline;cursor:pointer">Impressum</button></span></div>`}
 
 /* =========================================================
@@ -67,7 +67,7 @@ function showImpressum(){
  Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
 
  <div class="notice">
- <strong>Hinweis zur F11Sb-App</strong>
+ <strong>Hinweis zur F11Sd-App</strong>
  <p style="margin-bottom:0">Diese App ist ein Unterrichts-/Klassenprojekt und kein offizielles IT-Angebot der Schulverwaltung. Die obigen Angaben entsprechen denen der offiziellen Schul-Website (fos-bos-weilheim.de). Für Rückfragen zu dieser App wende dich zusätzlich an die betreuende Lehrkraft. Eine ausführliche Datenschutzerklärung für die App selbst steht noch aus.</p>
  </div>
 
@@ -676,7 +676,7 @@ async function renderLernjournalRoute(){
 }
 
 function moduleError(title,file,error){
- return`${pageHead("CAMPUS-MODUL",title,"Das einzelne Modul konnte nicht geladen werden.",`<button class="secondary"onclick="go('start')">← Startseite</button>`)}
+ return`${pageHead("CAMPUS-MODUL",title,"Das einzelne Modul konnte nicht geladen werden.",`<button class="secondary"onclick="go('kalender')">← fpA Kalender</button>`)}
  <div class="card">
  <h3>Die Campus-App selbst funktioniert.</h3>
  <p>Nur dieses Modul ist momentan nicht erreichbar.</p>
@@ -1118,16 +1118,16 @@ async function renderKlassenteam(){
  <div class="card"style="margin-top:16px">
  <div class="kicker">TERMINE</div>
  <h2 style="margin-top:4px">Geburtstage im Klassenteam</h2>
- <div class="list">${birthdays.map(b=>{const c=personColor(b.uid);return`<div class="list-item"style="background:${c.bg};border-left:4px solid ${c.border};border-radius:8px;padding:10px 12px;margin-bottom:6px"><div><strong style="color:${c.text}">${esc(b.name)}</strong><small>${esc(b.date.toLocaleDateString("de-DE",{day:"2-digit",month:"long"}))}</small></div>${b.isToday?`<span class="pill green"> Heute!</span>`:`<span class="pill"style="background:${c.border};color:#fff">in ${b.days} Tagen</span>`}</div>`}).join("")||`<div class="empty">Noch keine Geburtstage eingetragen.</div>`}</div>
+ <div class="list">${birthdays.map(b=>{const c=personColor(b.uid);return`<div class="list-item"style="background:${c.bg};border-left:4px solid ${c.border};border-radius:8px;padding:10px 12px;margin-bottom:6px"><div><strong style="color:${c.text}">${esc(b.name)}</strong><small>${esc(b.date.toLocaleDateString("de-DE",{day:"2-digit",month:"long"}))}</small></div><div style="display:flex;align-items:center;gap:8px">${b.isToday?`<span class="pill green"> Heute!</span>`:`<span class="pill"style="background:${c.border};color:#fff">in ${b.days} Tagen</span>`}${(b.uid===currentUser.uid||isTeacher())?`<button type="button"class="secondary"style="padding:4px 8px"onclick="${b.uid===currentUser.uid?"removeBirthday()":`adminRemoveBirthday('${b.uid}')`}"title="Geburtstag entfernen">✕</button>`:""}</div></div>`}).join("")||`<div class="empty">Noch keine Geburtstage eingetragen.</div>`}</div>
  </div>
  ${footer()}`;
 }
 
 // ============================================================
-// STUNDENPLAN (WebUntis), NOTEN & WOCHENPLANUNG – F11Sb
+// STUNDENPLAN (WebUntis), NOTEN & WOCHENPLANUNG – F11Sd
 // ============================================================
 
-// Die 7 benoteten Fächer der F11Sb (Sozialwesen). Das Wahlpflichtfach
+// Die 7 benoteten Fächer der F11Sd (Sozialwesen). Das Wahlpflichtfach
 // ist reiner Förderunterricht, wird nicht benotet und taucht daher hier
 // bewusst nicht auf.
 const F11SB_FAECHER=[
@@ -1147,13 +1147,15 @@ const F11SB_FAECHER=[
 // B-Block-Termine exakt aus dem offiziellen Dokument "Einteilung Unterrichts-
 // und Praktikumszeit 2026/2027" der FOSBOS Weilheim übernommen (nur 6 Blöcke,
 // nicht 7 – vorherige Annahme war hier ungenau).
+// 11Sd: gleiche Termine wie 11Sb, aber umgekehrte Reihenfolge –
+// Pflege zuerst, dann Erziehung.
 const PRAKTIKUMSPHASEN=[
- {id:"pr1",start:"2026-09-15",end:"2026-10-02",titel:"Praktikum – B-Block – Erziehung (Block 1)",bereich:"Erziehungsbereich",icon:"🏫"},
- {id:"pr2",start:"2026-10-26",end:"2026-11-20",titel:"Praktikum – B-Block – Erziehung (Block 2)",bereich:"Erziehungsbereich",icon:"🏫"},
- {id:"pr3",start:"2026-12-14",end:"2027-01-15",titel:"Praktikum – B-Block – Erziehung (Block 3)",bereich:"Erziehungsbereich",icon:"🏫"},
- {id:"pr4",start:"2027-02-15",end:"2027-03-05",titel:"Praktikum – B-Block – Pflege (Block 1)",bereich:"Pflegebereich",icon:"🏥"},
- {id:"pr5",start:"2027-04-19",end:"2027-05-07",titel:"Praktikum – B-Block – Pflege (Block 2)",bereich:"Pflegebereich",icon:"🏥"},
- {id:"pr6",start:"2027-06-14",end:"2027-07-09",titel:"Praktikum – B-Block – Pflege (Block 3)",bereich:"Pflegebereich",icon:"🏥"}
+ {id:"pr1",start:"2026-09-15",end:"2026-10-02",titel:"Praktikum – B-Block – Pflege (Block 1)",bereich:"Pflegebereich",icon:"🏥"},
+ {id:"pr2",start:"2026-10-26",end:"2026-11-20",titel:"Praktikum – B-Block – Pflege (Block 2)",bereich:"Pflegebereich",icon:"🏥"},
+ {id:"pr3",start:"2026-12-14",end:"2027-01-15",titel:"Praktikum – B-Block – Pflege (Block 3)",bereich:"Pflegebereich",icon:"🏥"},
+ {id:"pr4",start:"2027-02-15",end:"2027-03-05",titel:"Praktikum – B-Block – Erziehung (Block 1)",bereich:"Erziehungsbereich",icon:"🏫"},
+ {id:"pr5",start:"2027-04-19",end:"2027-05-07",titel:"Praktikum – B-Block – Erziehung (Block 2)",bereich:"Erziehungsbereich",icon:"🏫"},
+ {id:"pr6",start:"2027-06-14",end:"2027-07-09",titel:"Praktikum – B-Block – Erziehung (Block 3)",bereich:"Erziehungsbereich",icon:"🏫"}
 ];
 
 // Aufträge je Praktikumsphase: von Lehrkräften gepflegt, überall live
@@ -1604,7 +1606,7 @@ function webUntisEmbedHTML(heightPx,openByDefault){
  const url=webUntisUrl();
  return `<details class="untis-embed"${openByDefault?"open":""}>
  <summary> Stundenplan anzeigen/ausblenden</summary>
- <iframe src="${url}"loading="lazy"style="width:100%;height:${heightPx}px;border:1px solid var(--line,#e2eaf0);border-radius:10px;background:#fff"class="untis-iframe"title="Stundenplan F11Sb (WebUntis)"></iframe>
+ <iframe src="${url}"loading="lazy"style="width:100%;height:${heightPx}px;border:1px solid var(--line,#e2eaf0);border-radius:10px;background:#fff"class="untis-iframe"title="Stundenplan F11Sd (WebUntis)"></iframe>
  <div class="untis-fallback"><small>Wird der Stundenplan oben nicht angezeigt? Manche Schulnetzwerke blockieren die Einbettung.</small>
  <a href="${url}"target="_blank"rel="noopener"class="pill"> Stundenplan in WebUntis öffnen ↗</a></div>
  </details>`;
@@ -1956,7 +1958,7 @@ function wasFehltNochJahr(noten){
 // Einschätzungsbogen ist nur bei den ersten beiden Blöcken je Ausbildungsrichtung
 // Pflicht (bestätigt: Erziehung pr1+pr2, Pflege pr5+pr6 – Abgabe 01.10./19.11.2026
 // bzw. 29.04./24.06.2027), Tätigkeitsnachweis bei allen 7 Blöcken.
-const EINSCHAETZUNG_PFLICHT_PHASEN=["pr2","pr5","pr6"];
+const EINSCHAETZUNG_PFLICHT_PHASEN=["pr2","pr3","pr4","pr5"];
 // Feste Abgabetermine für den Einschätzungsbogen, wo diese von der
 // "letzter Donnerstag des Blocks"-Formel abweichen (explizit vorgegeben).
 const EINSCHAETZUNG_FRIST_FIX={pr2:"2026-11-12",pr3:"2026-12-22"};
@@ -1964,7 +1966,7 @@ function einschaetzungFrist(phaseId){
  return EINSCHAETZUNG_FRIST_FIX[phaseId]||letzterDonnerstagVorOrAm(PRAKTIKUMSPHASEN.find(x=>x.id===phaseId)?.end);
 }
 function praktikumsberichtTypenFuerPhase(phaseId){
- const typen=[{typ:"taetigkeit",label:"Tätigkeitsnachweis"}];
+ const typen=[{typ:"taetigkeit",label:"Tätigkeitsnachweis"},{typ:"arbeitszeiten",label:"Arbeitszeiten-Nachweis"}];
  if(EINSCHAETZUNG_PFLICHT_PHASEN.includes(phaseId))typen.push({typ:"einschaetzung",label:"Einschätzungsbogen"});
  return typen;
 }
@@ -2007,14 +2009,16 @@ async function getAllePraktikumsberichte(){
 async function uploadPraktikumsbericht(phaseId,typ){
  const input=$(`pbFile_${phaseId}_${typ}`);
  const file=input?.files?.[0];
+ const kommentar=$(`pbKommentar_${phaseId}_${typ}`)?.value.trim()||"";
  if(!file){toast("Bitte zuerst eine Datei auswählen.");return}
+ if(file.type!=="application/pdf"&&!file.name.toLowerCase().endsWith(".pdf")){toast("Bitte nur PDF-Dateien hochladen.");return}
  try{
  toast("Datei wird hochgeladen …");
  const up=await uploadCampusDatei(file,`praktikumsberichte/${phaseId}_${typ}`);
  const docId=`${currentUser.uid}_${phaseId}_${typ}`;
  await setDoc(doc(db,"praktikumsberichte",docId),{
  uid:currentUser.uid,name:profile?.displayName||currentUser.email||"Schüler/in",
- phaseId,typ,dateiUrl:up.url,dateiName:up.name,hochgeladenAm:serverTimestamp(),
+ phaseId,typ,dateiUrl:up.url,dateiName:up.name,kommentar,hochgeladenAm:serverTimestamp(),
  ampel:null,unterschriftBetreuer:null,stempelBetrieb:null,unterschriftSchueler:null,ausfuehrlichkeit:null
  },{merge:true});
  await openPraktikumsblockDetail(phaseId);
@@ -2040,6 +2044,155 @@ async function saveAmpelBewertung(uid,phaseId,typ){
 }
 window.saveAmpelBewertung=saveAmpelBewertung;
 
+// ---- Praktikumsbesuche: Lehrkraft plant die Route, trägt Termine ein ----
+async function getPraktikumsbesuche(){
+ try{
+ const snap=await getDocs(query(collection(db,"praktikumsbesuche"),orderBy("reihenfolge","asc")));
+ return snap.docs.map(d=>({id:d.id,...d.data()}));
+ }catch(e){console.error("Praktikumsbesuche laden:",e);return[]}
+}
+async function openPraktikumsbesuchForm(id){
+ const besuche=id?await getPraktikumsbesuche():[];
+ const b=besuche.find(x=>x.id===id)||{};
+ modal(`<button class="modal-close"onclick="closeModal()">×</button>
+ <div class="kicker">PRAKTIKUMSBESUCH</div>
+ <h2>${id?"Bearbeiten":"Neue Praktikumsstelle"}</h2>
+ <div class="form">
+ <label>Reihenfolge (Position auf der Route)<input id="pbeReihenfolge"type="number"min="1"value="${b.reihenfolge??""}"placeholder="z. B. 1"></label>
+ <label>Schüler:in<input id="pbeSchueler"type="text"value="${esc(b.schueler||"")}"placeholder="Name der/des Schüler:in"></label>
+ <label>Praktikumsbetrieb<input id="pbeBetrieb"type="text"value="${esc(b.betrieb||"")}"placeholder="Name der Einrichtung"></label>
+ <label>Adresse<input id="pbeAdresse"type="text"value="${esc(b.adresse||"")}"placeholder="Straße, PLZ Ort"></label>
+ <label>Datum des Besuchs<input id="pbeDatum"type="date"value="${b.datum||""}"></label>
+ <label>Uhrzeit<input id="pbeUhrzeit"type="time"value="${b.uhrzeit||""}"></label>
+ <label>Notiz (optional)<textarea id="pbeNotiz"rows="2"placeholder="z. B. Ansprechpartner, Parkhinweis">${esc(b.notiz||"")}</textarea></label>
+ <div class="form-actions">
+ <button class="primary"onclick="savePraktikumsbesuch('${id||""}')">Speichern</button>
+ ${id?`<button class="secondary"onclick="deletePraktikumsbesuch('${id}')">Löschen</button>`:""}
+ <button class="secondary"onclick="openPraktikumsbesucheUebersicht()">Abbrechen</button>
+ </div>
+ </div>
+ `);
+}
+window.openPraktikumsbesuchForm=openPraktikumsbesuchForm;
+async function savePraktikumsbesuch(id){
+ if(!isTeacher()){toast("Nur Lehrkräfte können Praktikumsbesuche eintragen.");return}
+ const reihenfolge=parseInt($("pbeReihenfolge")?.value,10);
+ const schueler=$("pbeSchueler")?.value.trim();
+ const betrieb=$("pbeBetrieb")?.value.trim();
+ if(!Number.isFinite(reihenfolge)||!schueler||!betrieb){toast("Bitte mindestens Reihenfolge, Schüler:in und Betrieb angeben.");return}
+ const payload={
+ reihenfolge,schueler,betrieb,
+ adresse:$("pbeAdresse")?.value.trim()||"",
+ datum:$("pbeDatum")?.value||"",
+ uhrzeit:$("pbeUhrzeit")?.value||"",
+ notiz:$("pbeNotiz")?.value.trim()||"",
+ updatedAt:serverTimestamp()
+ };
+ try{
+ if(id)await updateDoc(doc(db,"praktikumsbesuche",id),payload);
+ else{payload.createdAt=serverTimestamp();await addDoc(collection(db,"praktikumsbesuche"),payload)}
+ toast("Gespeichert.");
+ await openPraktikumsbesucheUebersicht();
+ }catch(e){console.error("Praktikumsbesuch speichern:",e);toast(e?.code==="permission-denied"?"Firebase verweigert das Speichern. Bitte die Firestore-Regeln prüfen.":"Konnte nicht gespeichert werden.");}
+}
+window.savePraktikumsbesuch=savePraktikumsbesuch;
+async function deletePraktikumsbesuch(id){
+ if(!confirm("Diesen Praktikumsbesuch wirklich löschen?"))return;
+ try{await deleteDoc(doc(db,"praktikumsbesuche",id));toast("Gelöscht.");await openPraktikumsbesucheUebersicht();}
+ catch(e){console.error(e);toast("Konnte nicht gelöscht werden.")}
+}
+window.deletePraktikumsbesuch=deletePraktikumsbesuch;
+async function openPraktikumsbesucheUebersicht(){
+ closeModal();
+ go("praktikumsbesuche");
+}
+window.openPraktikumsbesucheUebersicht=openPraktikumsbesucheUebersicht;
+
+async function renderPraktikumsbesuche(){
+ const besuche=await getPraktikumsbesuche();
+ const geplant=besuche.filter(b=>b.datum).length;
+ return`${pageHead("FPA · TERMINPLANUNG","Praktikumsbesuche",`Route und Termine für die Besuche in den Praktikumsstellen. ${geplant} von ${besuche.length} Terminen bereits festgelegt.`,isTeacher()?`<button class="primary"onclick="openPraktikumsbesuchForm()">＋ Praktikumsstelle</button> <button class="secondary"onclick="openPraktikumsbesucheImport()"> Route importieren</button>`:"")}
+ ${!besuche.length?`<div class="empty"><strong>Noch keine Praktikumsstellen eingetragen.</strong>${isTeacher()?"Sobald die Adressliste vorliegt, wird hier eine sinnvolle Route (nahe beieinanderliegende Orte hintereinander) vorgeschlagen – du musst dann nur noch Uhrzeit je Station eintragen.":"Die Lehrkraft plant die Besuchsroute – hier erscheinen die Termine, sobald sie feststehen."}</div>`
+ :`<div class="kicker"style="margin-bottom:10px">MEINE ROUTE · ${besuche.length} STATIONEN</div>
+ <div class="pk-zeitstrahl">${besuche.map(b=>{
+ const istMeins=!isTeacher()&&(b.schueler||"").toLowerCase().trim()===(profile?.displayName||"").toLowerCase().trim();
+ return`<div class="pk-node"style="border-left:4px solid ${isTeacher()?"#4a90d9":istMeins?"#3fa66a":"#e2eaf0"}">
+ <div class="pk-summary"style="cursor:default">
+ <span class="pk-icon">${b.reihenfolge}.</span>
+ <div class="pk-info">
+ <strong>${esc(b.schueler)} ${istMeins?" (das bist du)":""}</strong>
+ <small>${esc(b.betrieb)}${b.adresse?` · ${esc(b.adresse)}`:""}</small>
+ ${!isTeacher()?`<small>${b.datum?` ${esc(fmtDateOnly(b.datum))}${b.uhrzeit?", "+esc(b.uhrzeit)+" Uhr":""}`:" Termin noch nicht festgelegt"}</small>`:""}
+ ${b.notiz&&isTeacher()?`<small> ${esc(b.notiz)}</small>`:""}
+ </div>
+ ${isTeacher()?`<button type="button"class="secondary"style="padding:4px 8px;font-size:11px"onclick="openPraktikumsbesuchForm('${b.id}')">Bearbeiten</button>`:""}
+ </div>
+ ${isTeacher()?`<div style="display:flex;gap:8px;align-items:center;padding:0 12px 10px 40px;flex-wrap:wrap">
+ <input type="date"id="pbeDatumInline_${b.id}"value="${b.datum||""}"style="font-size:12px;padding:4px 6px">
+ <input type="time"id="pbeUhrzeitInline_${b.id}"value="${b.uhrzeit||""}"style="font-size:12px;padding:4px 6px">
+ <button type="button"class="secondary"style="padding:4px 8px;font-size:11px"onclick="saveBesuchTermin('${b.id}')">Termin speichern</button>
+ </div>`:""}
+ </div>`;
+ }).join("")}</div>`}
+ ${footer()}`;
+}
+window.renderPraktikumsbesuche=renderPraktikumsbesuche;
+async function saveBesuchTermin(id){
+ if(!isTeacher()){toast("Nur Lehrkräfte können Termine eintragen.");return}
+ const datum=$(`pbeDatumInline_${id}`)?.value||"";
+ const uhrzeit=$(`pbeUhrzeitInline_${id}`)?.value||"";
+ try{
+ await updateDoc(doc(db,"praktikumsbesuche",id),{datum,uhrzeit,updatedAt:serverTimestamp()});
+ toast("Termin gespeichert.");
+ await render();
+ }catch(e){console.error("Termin speichern:",e);toast(e?.code==="permission-denied"?"Firebase verweigert das Speichern. Bitte die Firestore-Regeln prüfen.":"Konnte nicht gespeichert werden.");}
+}
+window.saveBesuchTermin=saveBesuchTermin;
+// Massen-Import: eine fertig sortierte Route (eine Zeile je Station,
+// "Schüler;Betrieb;Adresse") wird auf einmal angelegt – Reihenfolge
+// ergibt sich aus der Zeilenreihenfolge. Bestehende Einträge werden
+// vorher gelöscht, damit ein erneuter Import nichts verdoppelt.
+function openPraktikumsbesucheImport(){
+ if(!isTeacher()){toast("Nur Lehrkräfte können importieren.");return}
+ modal(`<button class="modal-close"onclick="closeModal()">×</button>
+ <div class="kicker">PRAKTIKUMSBESUCHE · IMPORT</div>
+ <h2>Route importieren</h2>
+ <p style="font-size:12px;color:var(--muted)">Eine Zeile pro Station, in der gewünschten Reihenfolge: <code>Schüler;Betrieb;Adresse</code>. Bestehende Einträge werden dabei ersetzt.</p>
+ <div class="form">
+ <textarea id="pbImportText"rows="12"placeholder="Max Mustermann;Kita Sonnenschein;Musterstr. 1, 82362 Weilheim
+Lena Beispiel;AWO Seniorenzentrum;Beispielweg 5, 82362 Weilheim"></textarea>
+ <div class="form-actions">
+ <button class="primary"onclick="importPraktikumsbesuche()">Importieren</button>
+ <button class="secondary"onclick="closeModal()">Abbrechen</button>
+ </div>
+ </div>
+ `);
+}
+window.openPraktikumsbesucheImport=openPraktikumsbesucheImport;
+async function importPraktikumsbesuche(){
+ if(!isTeacher()){toast("Nur Lehrkräfte können importieren.");return}
+ const text=$("pbImportText")?.value||"";
+ const zeilen=text.split("\n").map(z=>z.trim()).filter(Boolean);
+ if(!zeilen.length){toast("Bitte mindestens eine Zeile eingeben.");return}
+ try{
+ const bestehend=await getPraktikumsbesuche();
+ for(const b of bestehend)await deleteDoc(doc(db,"praktikumsbesuche",b.id));
+ let reihenfolge=1;
+ for(const zeile of zeilen){
+ const[schueler,betrieb,adresse]=zeile.split(";").map(t=>(t||"").trim());
+ if(!schueler||!betrieb)continue;
+ await addDoc(collection(db,"praktikumsbesuche"),{
+ reihenfolge,schueler,betrieb,adresse:adresse||"",datum:"",uhrzeit:"",notiz:"",createdAt:serverTimestamp(),updatedAt:serverTimestamp()
+ });
+ reihenfolge++;
+ }
+ toast(`${reihenfolge-1} Stationen importiert.`);
+ closeModal();
+ await render();
+ }catch(e){console.error("Import fehlgeschlagen:",e);toast(e?.code==="permission-denied"?"Firebase verweigert das Speichern. Bitte die Firestore-Regeln prüfen.":"Import fehlgeschlagen.");}
+}
+window.importPraktikumsbesuche=importPraktikumsbesuche;
+
 // Schnell-Ampel für die Kurzdurchsicht: setzt nur die Farbe, ohne die vier
 // Detailkriterien abzufragen. Lässt bereits gesetzte Kriterien unangetastet.
 async function schnellAmpel(uid,phaseId,typ,ampel){
@@ -2062,7 +2215,7 @@ async function openPraktikumsblockDetail(phaseId){
  const meineBerichte=await getMeinePraktikumsberichte();
  const frist=letzterDonnerstagVorOrAm(p.end);
  const typen=praktikumsberichtTypenFuerPhase(phaseId);
- const dateiNamen={taetigkeit:"taetigkeitsnachweis.pdf",einschaetzung:"einschaetzungsbogen.pdf"};
+ const dateiNamen={taetigkeit:"taetigkeitsnachweis.pdf",einschaetzung:"einschaetzungsbogen.pdf",arbeitszeiten:"fehlzeitentabelle.pdf"};
  modal(`<button class="modal-close"onclick="closeModal()">×</button>
  <div class="kicker">${p.icon} ${esc(p.bereich)} · ${esc(fmtDateOnly(p.start))}–${esc(fmtDateOnly(p.end))}</div>
  <h2>${esc(p.titel)}</h2>
@@ -2078,27 +2231,26 @@ async function openPraktikumsblockDetail(phaseId){
  :""}
 
  <h3 style="margin-bottom:2px"> Blockberichte</h3>
- <p style="font-size:12px;color:var(--muted);margin-top:0">Formular ausfüllen/unterschreiben lassen, dann hier als Foto/Scan hochladen. Jeweils bis 19:00 Uhr des Abgabetermins.</p>
+ <p style="font-size:12px;color:var(--muted);margin-top:0">Formular ausfüllen/unterschreiben lassen, dann hier als Foto/Scan hochladen. Jeweils bis 19:00 Uhr des Abgabetermins. Falls etwas Besonderes ist (z. B. andere Unterschrift als üblich), gerne kurz im Kommentarfeld erwähnen.</p>
  ${typen.map(t=>{
  const eintrag=meineBerichte[`${phaseId}_${t.typ}`];
  const terminDieserArt=t.typ==="einschaetzung"?einschaetzungFrist(phaseId):frist;
  return`<div class="card"style="margin-bottom:12px;background:${eintrag?"var(--soft-green)":"#f7fafc"}">
  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
  <strong>${esc(t.label)}</strong>
- <span style="display:flex;gap:10px">
  <a href="${dateiNamen[t.typ]}"download style="font-size:11px">Formular als PDF herunterladen ↓</a>
- ${t.typ==="taetigkeit"?`<a href="fehlzeitentabelle.pdf"download style="font-size:11px"> + Anlage Fehlzeitentabelle ↓</a>`:""}
- </span>
  </div>
  <small style="display:block;color:var(--muted);margin-top:4px">Abgabe: ${esc(fmtDateOnly(terminDieserArt))}, 19:00 Uhr</small>
  ${eintrag?`<div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
  <a href="${esc(eintrag.dateiUrl)}"target="_blank"rel="noopener"class="pill"> ${esc(eintrag.dateiName)}</a>
  <span class="pill"style="background:${ampelFarbe(eintrag.ampel)};color:#fff">${esc(ampelText(eintrag.ampel))}</span>
- </div>`
- :`<div class="form-actions"style="margin-top:8px">
- <input id="pbFile_${phaseId}_${t.typ}"type="file"accept="image/*,.pdf"style="flex:1;min-width:160px">
+ </div>
+ ${eintrag.kommentar?`<div class="notice"style="margin-top:8px;border-left:4px solid #9b59b6"><strong style="font-size:11px"> Dein Kommentar</strong><p style="margin:4px 0 0;font-size:12px;white-space:pre-wrap">${esc(eintrag.kommentar)}</p></div>`:""}`
+ :`<div class="form-actions"style="margin-top:8px;flex-wrap:wrap">
+ <input id="pbFile_${phaseId}_${t.typ}"type="file"accept="application/pdf,.pdf"style="flex:1;min-width:160px">
  <button class="primary"onclick="uploadPraktikumsbericht('${phaseId}','${t.typ}')">＋ Hochladen</button>
- </div>`}
+ </div>
+ <textarea id="pbKommentar_${phaseId}_${t.typ}"rows="2"style="margin-top:6px;font-size:12px"placeholder="Kommentar an die Lehrkraft (optional) – z. B. falls jemand anderes als sonst unterschrieben hat"></textarea>`}
  </div>`;
  }).join("")}
  <div class="form-actions"style="margin-top:10px"><button class="secondary"onclick="closeModal()">Schließen</button></div>
@@ -2201,7 +2353,7 @@ async function printPraktikumsGesamtPDF(){
  @media print{.print-note{display:none}}
  </style></head><body>
  <div class="print-note">Im Druckdialog „Als PDF sichern“ auswählen.</div>
- <h1>Praktikumsberichte – Ampel-Gesamtsicht F11Sb</h1>
+ <h1>Praktikumsberichte – Ampel-Gesamtsicht F11Sd</h1>
  <div class="meta">TN = Tätigkeitsnachweis, EB = Einschätzungsbogen · Stand: ${new Date().toLocaleDateString("de-DE")}</div>
  <table><thead><tr><th>Schüler:in</th>${head}</tr></thead><tbody>${rows}</tbody></table>
  <div class="legende">🟩 pünktlich &amp; vollständig &nbsp; 🟧 unvollständig &nbsp; 🟥 zu spät/fehlerhaft &nbsp; ⬜ noch offen</div>
@@ -2225,6 +2377,7 @@ async function openAmpelBewertungForm(uid,phaseId,typ){
  <h2>Bewertung</h2>
  <a href="${esc(eintrag.dateiUrl)}"target="_blank"rel="noopener"class="pill"style="margin-bottom:10px;display:inline-block"> ${esc(eintrag.dateiName)} ansehen</a>
  ${hochgeladenAm?`<p style="font-size:12px;color:${verspaetet?"#d9534f":"var(--muted)"}">Hochgeladen: ${hochgeladenAm.toLocaleString("de-DE")}${verspaetet?" – NACH der Frist!":" – rechtzeitig"}</p>`:""}
+ ${eintrag.kommentar?`<div class="notice"style="margin:8px 0;border-left:4px solid #9b59b6"><strong style="font-size:11px"> Kommentar von ${esc(eintrag.name)}</strong><p style="margin:4px 0 0;font-size:12px;white-space:pre-wrap">${esc(eintrag.kommentar)}</p></div>`:""}
  <div class="form"style="margin-top:10px">
  <label class="check"><input id="amp_ub_${uid}_${phaseId}_${typ}"type="checkbox"${eintrag.unterschriftBetreuer?"checked":""}> Unterschrift Betreuer:in vorhanden</label>
  <label class="check"><input id="amp_sb_${uid}_${phaseId}_${typ}"type="checkbox"${eintrag.stempelBetrieb?"checked":""}> Stempel des Betriebes vorhanden</label>
@@ -2380,12 +2533,12 @@ async function renderStart(){
  const upcomingTime=nextCalendar?.time?` · ${esc(nextCalendar.time)} Uhr`:"";
  const newsAction=(isTeacher()?`<button class="primary"onclick="openNewsForm()">＋ News veröffentlichen</button>`:"")
  +(isTeacher()?`<button class="secondary"onclick="openUserManagement()"> Benutzer verwalten</button>`:"");
- return`<section class="hero"><div><span class="badge"> F11Sb 26/27</span><h1>Willkommen auf dem Campus.</h1><p>Hier
-verbinden wir Lernen, Projekte, Praxis und Gemeinschaft. Alle angemeldeten Mitglieder arbeiten am selben digitalen Campus.</p>
-</div><div class="actions">${isTeacher()?`<button class="primary"onclick="openNewsForm()">＋ News veröffentlichen</button>`:""}<button class="secondary"onclick="go('kompass')">Mein Kompass →</button><button class="secondary"onclick="go('forum')">Campus-Forum</button></div></section>
+ return`<section class="hero"><div><span class="badge"> F11Sd 26/27</span><h1>Willkommen im fpA-Campus.</h1><p>Hier
+verwaltest du Praktikumsphasen, Blockberichte und die Besuchstermine – alles rund um die fachpraktische Ausbildung.</p>
+</div><div class="actions">${isTeacher()?`<button class="primary"onclick="openNewsForm()">＋ News veröffentlichen</button>`:""}<button class="secondary"onclick="go('praktikum')">fpA öffnen →</button><button class="secondary"onclick="go('praktikumsbesuche')">Praktikumsbesuche</button></div></section>
  <div class="grid grid-3">
  <div class="card card-compact"style="border-left:4px solid #4a90d9"><h3> Campus-News</h3><div class="list">${news.slice(0,3).map(p=>`<div
-class="list-item"><div><strong>${esc(p.title||p.text)}</strong>${p.title?`<small>${esc(p.text)} · ${fmtDate(p.createdAt)}</small>`:`<small>${fmtDate(p.createdAt)}</small>`}</div><div style="display:flex;align-items:center;gap:8px"><span class="pill">Info</span>${isAdmin()?`<button class="secondary"onclick="deleteNews('${p.id}')">Löschen</button>`:""}</div>
+class="list-item"style="display:block"><strong style="display:block">${esc(p.title||p.text)}</strong>${p.title?`<small style="display:block;margin-top:2px">${esc(p.text)} · ${fmtDate(p.createdAt)}</small>`:`<small style="display:block;margin-top:2px">${fmtDate(p.createdAt)}</small>`}<div style="display:flex;align-items:center;gap:8px;margin-top:8px"><span class="pill">Info</span>${isTeacher()?`<button class="secondary"style="padding:4px 10px;font-size:12px"onclick="openEditNewsForm('${p.id}','${esc(String(p.title||"").replace(/\n/g,"\\n"))}','${esc(String(p.text||"").replace(/\n/g,"\\n"))}')">Bearbeiten</button>`:""}${isAdmin()?`<button class="secondary"style="padding:4px 10px;font-size:12px"onclick="deleteNews('${p.id}')">Löschen</button>`:""}</div>
 </div>`).join("")||`<div class="empty">Noch keine News.</div>`}</div></div>
  <div class="card card-compact"style="border-left:4px solid #9b59b6"><h3> Nächster Termin</h3><div class="list">${nextCalendar?`<div class="list-item"><div><strong>${esc(nextCalendar.title||nextCalendar.name||"Termin")}</strong><small>${esc(upcomingDateText)}${upcomingTime}</small></div><span class="pill green">Termin</span></div>`:`<div class="empty">Noch keine anstehenden Termine.</div>`}</div></div>
  <div class="card card-compact"style="border-left:4px solid #e0629e"><h3> Geburtstage</h3>${
@@ -2416,31 +2569,16 @@ class="list-item"><div><strong>${esc(p.title||p.text)}</strong>${p.title?`<small
  ${aktuellerPraktikumsauftrag.beschreibung?`<small style="display:block;margin-top:4px;color:var(--muted)">${esc(aktuellerPraktikumsauftrag.beschreibung.slice(0,140))}${aktuellerPraktikumsauftrag.beschreibung.length>140?"…":""}</small>`:""}
  </a>`:""}
  ${(()=>{ensureGlobalClock();return"";})()}
- <div class="card"style="margin-top:16px;margin-bottom:16px">
- <div class="kicker">STUNDENPLAN</div>
- <h2 style="margin-top:4px">Aktueller Stundenplan</h2>
- ${webUntisEmbedHTML(300)}
- <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
- <input id="quickWpInput"type="text"maxlength="140"placeholder="Was steht diese Woche an? Kurz eintragen …"style="flex:1;min-width:220px">
- <button class="primary"onclick="quickAddWochenplan()">＋ Zur Wochenplanung</button>
- <button class="secondary"onclick="go('kompass')">Ausführlicher planen →</button>
- </div>
- ${wochenplan.length?`<div class="list"style="margin-top:10px">${wochenplan.filter(w=>!w.done).slice(0,3).map(w=>`<div class="list-item"><div><strong>${esc(w.title)}</strong>${w.subject?`<small>${esc(F11SB_FAECHER.find(f=>f.key===w.subject)?.label||"")}</small>`:""}</div><span class="pill">${w.scope==="monat"?"Monat":"Woche"}</span></div>`).join("")}</div>`:""}
- </div>
  <div class="card"style="margin-bottom:16px;text-align:center;border-left:4px solid #3fa66a">
  <h2 style="margin:0 0 8px"> FOSBOS-WM Jahresfokus: Solidarität und Zusammenhalt</h2>
  <p style="margin:0;font-style:italic;color:var(--muted)">„Solidarität lebt von kleinen Taten – heute schon jemandem geholfen?“</p>
  </div>
  ${pageHead("ÜBERSICHT","Unser Campus","Die wichtigsten Bereiche auf einen Blick.",newsAction)}
  <div class="grid grid-4">
- ${tile(" ","Campus-Kompass","Dein persönlicher Lern- und Projektüberblick.","kompass")}
- ${tile(" ","Lernwerkstatt","Lernaufträge, Methoden, Tools und KI.","lernwerkstatt")}
- ${tile(" ","Campus-Forum","Austauschen, fragen, helfen und gemeinsam denken.","forum")}
- ${tile(" ","Projekte","Projektteams, Ziele, Fortschritt und Ergebnisse.","projekte")}
- ${tile(" ","Kompetenzwerkstatt","Kompetenzen sichtbar machen und entwickeln.","kompetenz")}
- ${tile(" ","Lernjournal","Lernweg, Reflexionen und nächste Schritte.","journal")}
- ${tile(" ","fpA","Theorie-Praxis-Transfer-Aufträge und Reflexion.","praktikum")}
- ${tile(" ","KI-Innovationslabor","KI-Ideen und Innovationspartnerschaften.","ki")}</div>
+ ${tile(" ","Unser Klassenteam","Steckbriefe, Geburtstage und Klasseninfos.","klassenteam")}
+ ${tile(" ","fpA","Praktikumsphasen, Blockberichte und Ampel-Übersicht.","praktikum")}
+ ${tile(" ","Praktikumsbesuche","Route und Termine für die Betriebsbesuche.","praktikumsbesuche")}
+ ${tile(" ","Campus-Kalender","Termine, Prüfungen und Schulferien.","kalender")}</div>
 </div>${footer()}`;
 }
 async function getRecentForumActivityCount(days){
@@ -2462,7 +2600,7 @@ function printNotenPDF(noten,bestehen){
  const rows=F11SB_FAECHER.map(f=>`<tr><td>${escPDF(f.label)}</td><td>${fmt(f.key,"hj1")}</td><td>${fmt(f.key,"hj2")}</td></tr>`).join("");
  const fpaRow=`<tr><td><em>Fachpraktische Ausbildung</em></td><td>${fmtFpa("hj1")}</td><td>${fmtFpa("hj2")}</td></tr>`;
  const statusText=(label,r)=>!r?`${label}: noch nicht alle Noten eingetragen.`:`${label}: ${r.passed?"nach aktueller Punktlage bestanden":"nach aktueller Punktlage nicht bestanden"}.`;
- win.document.write(`<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Meine Noten – F11Sb</title>
+ win.document.write(`<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Meine Noten – F11Sd</title>
  <style>
  @page{size:A4;margin:18mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#222;line-height:1.55;margin:0}
  h1{font-size:24px;margin:0 0 4px}.meta{color:#666;font-size:12px;margin-bottom:20px}
@@ -2473,7 +2611,7 @@ function printNotenPDF(noten,bestehen){
  @media print{.print-note{display:none}}
  </style></head><body>
  <div class="print-note">Persönliche Notenübersicht. Im Druckdialog „Als PDF sichern“ auswählen.</div>
- <h1>Meine Noten – F11Sb</h1>
+ <h1>Meine Noten – F11Sd</h1>
  <div class="meta">Punkte 0–15 je Fach und Halbjahr</div>
  <table><thead><tr><th>Fach</th><th>HJ1</th><th>HJ2</th></tr></thead><tbody>${rows}${fpaRow}</tbody></table>
  <div class="status">
@@ -2489,7 +2627,7 @@ function printWochenplanPDF(entries){
  const win=window.open("","_blank","width=800,height=800");
  if(!win){toast("Das PDF-Fenster wurde vom Browser blockiert. Bitte Pop-ups erlauben.");return}
  const rows=entries.map(w=>`<tr><td>${w.done?"✓":""}</td><td>${escPDF(w.title)}</td><td>${w.subject?escPDF(F11SB_FAECHER.find(f=>f.key===w.subject)?.label||""):"—"}</td><td>${w.scope==="monat"?"Monat":"Woche"}</td><td>${escPDF(w.dueDate||"—")}</td></tr>`).join("");
- win.document.write(`<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Wochenplanung – F11Sb</title>
+ win.document.write(`<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Wochenplanung – F11Sd</title>
  <style>
  @page{size:A4;margin:18mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#222;line-height:1.55;margin:0}
  h1{font-size:24px;margin:0 0 16px}
@@ -2499,7 +2637,7 @@ function printWochenplanPDF(entries){
  @media print{.print-note{display:none}}
  </style></head><body>
  <div class="print-note">Persönliche Wochen-/Monatsplanung. Im Druckdialog „Als PDF sichern“ auswählen.</div>
- <h1>Meine Wochen-/Monatsplanung – F11Sb</h1>
+ <h1>Meine Wochen-/Monatsplanung – F11Sd</h1>
  <table><thead><tr><th>Erl.</th><th>Was steht an</th><th>Fach</th><th>Zeitraum</th><th>Termin</th></tr></thead><tbody>${rows||"<tr><td colspan=5>Noch keine Einträge.</td></tr>"}</tbody></table>
  <script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>
  </body></html>`);
@@ -3041,7 +3179,7 @@ async function renderLernwerkstatt(){
  ]},
  {title:"Unterstützung holen",color:"#e0a324",items:[
  [" ","Lerncoaching","Individuelle Begleitung und Kontakt zu einer Lehrkraft.","lerncoaching"],
- [" ","Fragen & Hilfe","Antworten rund um die F11Sb und das Lernen.","fragenhilfe"]
+ [" ","Fragen & Hilfe","Antworten rund um die F11Sd und das Lernen.","fragenhilfe"]
  ]}
  ];
  return`${pageHead("SELBSTSTÄNDIG LERNEN","Lernwerkstatt","Der offene Lernraum für Lernaufträge, Methoden, Tools und KI.",`<button class="primary"onclick="openPostForm('idea')">＋ Lernimpuls</button>`)}
@@ -3077,7 +3215,7 @@ async function renderKollaborationsTools(){
  ];
  const toolTile=t=>`<a class="card tile"href="#${t[3]}"><span class="emoji">${t[0]}</span>
 <strong>${t[1]}</strong><small>${t[2]}</small>${!t[4]?`<span class="badge"style="margin-top:8px">IN VORBEREITUNG</span>`:""}</a>`;
- return`${pageHead("ZUSAMMENARBEIT","Tools für Zusammenarbeit","Kostenlose, direkt in die F11Sb integrierte Tools für Gruppenarbeit, Brainstorming und Unterricht – ganz ohne externe Anmeldung.",`<button class="secondary"onclick="go('lernwerkstatt')">← Lernwerkstatt</button>`)}
+ return`${pageHead("ZUSAMMENARBEIT","Tools für Zusammenarbeit","Kostenlose, direkt in die F11Sd integrierte Tools für Gruppenarbeit, Brainstorming und Unterricht – ganz ohne externe Anmeldung.",`<button class="secondary"onclick="go('lernwerkstatt')">← Lernwerkstatt</button>`)}
  <h3 style="margin:0 0 10px">🔴 Live im Unterricht</h3>
  <div class="grid grid-3">${liveTools.map(toolTile).join("")}</div>
  <h3 style="margin:22px 0 10px"> Projektorganisation</h3>
@@ -3285,7 +3423,7 @@ async function downloadWordcloudPDF(wordcloudId){
  </style>${wordcloudCloudHTML(items)}`;
  openToolPrintWindow(
  "Wortwolke – "+(cloud.title||"Wortwolke"),
- body,"F11Sb · Wortwolke"+(cloud.description?" · "+cloud.description:"")
+ body,"F11Sd · Wortwolke"+(cloud.description?" · "+cloud.description:"")
  );
  }catch(e){console.error("Wortwolke PDF:",e);toast("Die Wortwolke konnte nicht als PDF geöffnet werden.")}
 }
@@ -3477,7 +3615,7 @@ async function downloadKanbanPDF(boardId){
  }).join("");
  openToolPrintWindow(
  "Kanban-Board – "+(board.title||"Kanban-Board"),
- body,"F11Sb · Kanban-Board"+(board.description?" · "+board.description:"")
+ body,"F11Sd · Kanban-Board"+(board.description?" · "+board.description:"")
  );
  }catch(e){console.error("Kanban PDF:",e);toast("Das Kanban-Board konnte nicht als PDF geöffnet werden.")}
 }
@@ -3716,7 +3854,7 @@ async function downloadTermPollPDF(pollId){
  </div>`).join(""):`<p class="empty">Keine Terminvorschläge.</p>`;
  openToolPrintWindow(
  "Terminfindung – "+(poll.title||"Terminfindung"),
- body,"F11Sb · Terminfindung · "+votes.length+"Stimme(n) insgesamt"+(poll.description?" · "+poll.description:"")
+ body,"F11Sd · Terminfindung · "+votes.length+"Stimme(n) insgesamt"+(poll.description?" · "+poll.description:"")
  );
  }catch(e){console.error("Terminfindung PDF:",e);toast("Die Terminfindung konnte nicht als PDF geöffnet werden.")}
 }
@@ -3774,7 +3912,7 @@ async function downloadTeamAdsPDF(){
  ${interested.length?`<small>Interessiert: ${interested.map(i=>escPDF(i.name)).join(",")}</small>`:""}
  </div>`;
  }).join(""):`<p class="empty">Noch kein Gesuch.</p>`;
- openToolPrintWindow("Team gesucht",body,"F11Sb · Übersicht aller offenen Gesuche");
+ openToolPrintWindow("Team gesucht",body,"F11Sd · Übersicht aller offenen Gesuche");
  }catch(e){console.error("Team gesucht PDF:",e);toast("Die Übersicht konnte nicht als PDF geöffnet werden.")}
 }
 
@@ -4061,7 +4199,7 @@ async function downloadChecklistPDF(checklistId){
  </div>`).join(""):`<p class="empty">Noch keine Einträge.</p>`;
  openToolPrintWindow(
  "Checkliste – "+(list.title||"Checkliste"),
- body,"F11Sb · Gemeinsame Checkliste · "+done+"von"+items.length+"erledigt"+(list.description?" · "+list.description:"")
+ body,"F11Sd · Gemeinsame Checkliste · "+done+"von"+items.length+"erledigt"+(list.description?" · "+list.description:"")
  );
  }catch(e){console.error("Checkliste PDF:",e);toast("Die Checkliste konnte nicht als PDF geöffnet werden.")}
 }
@@ -4336,7 +4474,7 @@ async function downloadAmpelPDF(roundId){
  </tbody></table>`;
  openToolPrintWindow(
  "Verständnis-Ampel – "+(round.title||"Runde"),
- body,"F11Sb · Verständnis-Ampel · "+total+"Antwort(en)"+(round.description?" · "+round.description:"")
+ body,"F11Sd · Verständnis-Ampel · "+total+"Antwort(en)"+(round.description?" · "+round.description:"")
  );
  }catch(e){console.error("Ampel PDF:",e);toast("Die Runde konnte nicht als PDF geöffnet werden.")}
 }
@@ -4554,7 +4692,7 @@ async function downloadPollPDF(pollId){
  </tbody></table>`;
  openToolPrintWindow(
  "Live-Umfrage – "+(poll.question||"Umfrage"),
- body,"F11Sb · Live-Umfrage · "+total+"Stimme(n)"+(poll.description?" · "+poll.description:"")
+ body,"F11Sd · Live-Umfrage · "+total+"Stimme(n)"+(poll.description?" · "+poll.description:"")
  );
  }catch(e){console.error("Umfrage PDF:",e);toast("Die Umfrage konnte nicht als PDF geöffnet werden.")}
 }
@@ -4986,7 +5124,7 @@ async function downloadDeckPDF(deckId){
  </div>`).join(""):`<p class="empty">Noch keine Karten.</p>`;
  openToolPrintWindow(
  "Karteikarten – "+(deck.title||"Deck"),
- body,"F11Sb · Karteikarten · "+cards.length+"Karte(n)"+(deck.description?" · "+deck.description:"")
+ body,"F11Sd · Karteikarten · "+cards.length+"Karte(n)"+(deck.description?" · "+deck.description:"")
  );
  }catch(e){console.error("Karteikarten PDF:",e);toast("Das Deck konnte nicht als PDF geöffnet werden.")}
 }
@@ -5331,7 +5469,7 @@ async function downloadGlossaryPDF(){
  <strong>${escPDF(g.term)}</strong>
  <div>${escPDF(g.definition)}</div>
  </div>`).join(""):`<p class="empty">Noch keine Begriffe.</p>`;
- openToolPrintWindow("Glossar",body,"F11Sb · Fachbegriffe-Glossar · "+entries.length+"Begriff(e)");
+ openToolPrintWindow("Glossar",body,"F11Sd · Fachbegriffe-Glossar · "+entries.length+"Begriff(e)");
  }catch(e){console.error("Glossar PDF:",e);toast("Das Glossar konnte nicht als PDF geöffnet werden.")}
 }
 
@@ -5390,7 +5528,7 @@ function essaySelfCheckStatus(entry,criteriaCount){
  return {color:"yellow",label:`🟡 ${metCount}/${criteriaCount} Kriterien selbst erfüllt`};
 }
 
-// Fest eingebaute Beispiel-Fallbeispiele (aktuell keine für F11Sb hinterlegt –
+// Fest eingebaute Beispiel-Fallbeispiele (aktuell keine für F11Sd hinterlegt –
 // die App unterstützt sie aber genauso wie F12Sb, falls später gewünscht).
 const ESSAY_SEED_CASES=[];
 
@@ -5707,7 +5845,7 @@ async function downloadEssayPDF(caseId){
  </div>`).join("");
  openToolPrintWindow(
  "Fachaufsatz – "+(c.title||"Fallbeispiel"),
- body,"F11Sb · Fachaufsatz-Training"+(c.theoryArea?" · "+c.theoryArea:"")
+ body,"F11Sd · Fachaufsatz-Training"+(c.theoryArea?" · "+c.theoryArea:"")
  );
  }catch(e){console.error("Fachaufsatz PDF:",e);toast("Der Aufsatz konnte nicht als PDF geöffnet werden.")}
 }
@@ -5869,7 +6007,7 @@ async function renderForum(){
  <a class="card tile"href="#forum-board"style="min-height:180px;background:#fff;border:2px solid #4a90d9">
  <span class="emoji"></span>
  <strong>Forum</strong>
- <small>Gemeinsam denken, fragen, austauschen und unterstützen – für die ganze F11Sb sichtbar.</small>
+ <small>Gemeinsam denken, fragen, austauschen und unterstützen – für die ganze F11Sd sichtbar.</small>
  </a>
  <a class="card tile"href="#forum-nachrichten"style="min-height:180px;background:#fff;border:2px solid #1a9b8e">
  <span class="emoji"></span>
@@ -5966,7 +6104,7 @@ async function renderForumMessages(){
  <button class="secondary"title="Unterhaltung aus meiner Übersicht entfernen"onclick="event.stopPropagation();deleteConversation('${c.otherUid}','${esc(c.otherName||"")}')">Löschen</button>
  </div>
  </div>
- </article>`).join("")||`<div class="empty"><strong>Noch keine Nachrichten.</strong><p>Schreibe jemandem aus der F11Sb eine persönliche Nachricht.</p></div>`}
+ </article>`).join("")||`<div class="empty"><strong>Noch keine Nachrichten.</strong><p>Schreibe jemandem aus der F11Sd eine persönliche Nachricht.</p></div>`}
  </div>${footer()}`;
 }
 
@@ -6219,7 +6357,7 @@ async function getBoardPosts(boardId){
 
 async function renderPinnwandUebersicht(){
  const boards=await getBoards();
- return`${pageHead("ZUSAMMENARBEIT","Pinnwand","Digitale Pinnwände für Ideen, Brainstorming und Gruppenarbeit – im Raster, für die ganze F11Sb sichtbar.",`<button class="primary"onclick="openBoardForm()">＋ Neue Pinnwand</button>`)}
+ return`${pageHead("ZUSAMMENARBEIT","Pinnwand","Digitale Pinnwände für Ideen, Brainstorming und Gruppenarbeit – im Raster, für die ganze F11Sd sichtbar.",`<button class="primary"onclick="openBoardForm()">＋ Neue Pinnwand</button>`)}
  <div class="grid grid-3">${boards.map(b=>`
  <div class="card tile"style="cursor:pointer;text-align:left"onclick="openBoard('${b.id}')">
  <span class="emoji"></span>
@@ -6367,7 +6505,7 @@ async function downloadBoardPDF(boardId){
  </div>`).join(""):`<p class="empty">Noch keine Notizen.</p>`;
  openToolPrintWindow(
  "Pinnwand – "+(board.title||"Pinnwand"),
- body,"F11Sb · Pinnwand"+(board.description?" · "+board.description:"")
+ body,"F11Sd · Pinnwand"+(board.description?" · "+board.description:"")
  );
  }catch(e){console.error("Pinnwand PDF:",e);toast("Die Pinnwand konnte nicht als PDF geöffnet werden.")}
 }
@@ -7032,7 +7170,7 @@ function openJournalPrintWindow(title,students){
  const studentSections=students.map(student=>`
  <section class="student-section">
  <h1>${escPDF(student.name)}</h1>
- <div class="meta">F11Sb · Persönliches Lernjournal</div>
+ <div class="meta">F11Sd · Persönliches Lernjournal</div>
  ${student.entries.length
  ? student.entries.map(j=>`
  <article class="entry">
@@ -7191,7 +7329,7 @@ async function downloadAllJournalsPDF(){
 
  closeModal();
  openJournalPrintWindow(
- "F11Sb – Lernjournale",
+ "F11Sd – Lernjournale",
  students
  );
  }catch(e){
@@ -7603,7 +7741,7 @@ function resilienzCheckin(name){try{localStorage.setItem("campus_resilienz_"+nam
 
 async function renderFragenHilfe(){
  const faqs=[
- ["Was ist die F11Sb?","Die F11Sb verbindet selbstständiges Lernen, Projekte, Praxis, Kompetenzentwicklung und Gemeinschaft. Du arbeitest zunehmend eigenverantwortlich und kannst deinen Lernweg aktiv mitgestalten."],
+ ["Was ist die F11Sd?","Die F11Sd verbindet selbstständiges Lernen, Projekte, Praxis, Kompetenzentwicklung und Gemeinschaft. Du arbeitest zunehmend eigenverantwortlich und kannst deinen Lernweg aktiv mitgestalten."],
  ["Wie funktioniert das Lernen?","Du setzt Ziele, planst deine nächsten Schritte, bearbeitest Lernaufträge und reflektierst deinen Lernweg. Die Lernwerkstatt unterstützt dich dabei mit Methoden, Lernressourcen, Lernimpulsen und KI-Angeboten."],
  ["Wo finde ich meine Aufgaben?","Im Campus-Kompass findest du deine persönlichen Aufgaben, Projekte, Ziele und deinen aktuellen Lernweg."],
  ["Was ist die Lernwerkstatt?","Die Lernwerkstatt ist dein Bereich für selbstständiges Lernen. Dort findest du Lernpfade, Lernressourcen, Lernimpulse, Lernstandsmessungen, KI zum Lernen und diese Fragen-&-Hilfe-Seite."],
@@ -7612,15 +7750,15 @@ async function renderFragenHilfe(){
  ["Was ist Deeper Learning?","Deeper Learning bedeutet, dass du Wissen nicht nur aufnimmst, sondern es verstehst, anwendest, auf neue Situationen überträgst, Probleme löst, gemeinsam arbeitest und deine Ergebnisse reflektierst."],
  ["Was ist ein Lernjournal?","Im Lernjournal hältst du deinen Lernweg fest: Was habe ich gelernt? Was hat funktioniert? Wo gab es Schwierigkeiten? Was ist mein nächster Schritt?"],
  ["Was sind Lernstandsmessungen?","Sie helfen dir zu erkennen, wo du bei deinen Kompetenzen stehst und woran du als Nächstes arbeiten solltest. Die Ergebnisse können deine Kompetenzentwicklung sichtbar machen."],
- ["Wo finde ich Termine?","Im Campus-Kalender findest du die wichtigen Termine der F11Sb. Dort sind auch die Schulferien von Bayern für das Schuljahr 2026/27 markiert."],
- ["Was mache ich bei Fragen zur F11Sb?","Wenn deine Frage hier nicht beantwortet wird, wende dich an deine Lehrkraft bzw. das Klassenteam. Die Seite soll dir zunächst schnelle Orientierung zu F11Sb und Lernen geben."]
+ ["Wo finde ich Termine?","Im Campus-Kalender findest du die wichtigen Termine der F11Sd. Dort sind auch die Schulferien von Bayern für das Schuljahr 2026/27 markiert."],
+ ["Was mache ich bei Fragen zur F11Sd?","Wenn deine Frage hier nicht beantwortet wird, wende dich an deine Lehrkraft bzw. das Klassenteam. Die Seite soll dir zunächst schnelle Orientierung zu F11Sd und Lernen geben."]
  ];
 
- return`${pageHead("ORIENTIERUNG","Fragen & Hilfe","Antworten rund um die F11Sb, selbstständiges Lernen und deinen Lernweg.")}
+ return`${pageHead("ORIENTIERUNG","Fragen & Hilfe","Antworten rund um die F11Sd, selbstständiges Lernen und deinen Lernweg.")}
  <div class="card"style="margin-bottom:16px;border-left:4px solid #3fa66a">
  <span class="badge"> ORIENTIERUNG</span>
  <h2>Du hast eine Frage?</h2>
- <p>Hier findest du schnelle Antworten zu den wichtigsten Fragen rund um die F11Sb und das Lernen. Nutze die Themen als erste Orientierung.</p>
+ <p>Hier findest du schnelle Antworten zu den wichtigsten Fragen rund um die F11Sd und das Lernen. Nutze die Themen als erste Orientierung.</p>
  </div>
  <div class="grid grid-2">
  ${faqs.map(([q,a])=>`<details class="card"style="margin:0 0 12px">
@@ -7639,42 +7777,13 @@ function renderPraxisProjekte(){
 }
 
 async function renderPraktikum(){
- let assignments=[], questions=[], projects=[];
- let challenges=[],solutions=[],results=[];
- try{assignments=await getCollection("practice","createdAt",true)}catch(e){console.error(e)}
+ let questions=[],projects=[];
  try{questions=await getCollection("fpaQuestions","createdAt",true)}catch(e){console.error(e)}
  try{projects=await getCollection("fpaProjects","createdAt",true)}catch(e){console.error(e)}
- try{challenges=await getCollection("kiChallenges","createdAt",true)}catch(e){console.error(e)}
- try{solutions=await getCollection("kiSolutions","createdAt",true)}catch(e){console.error(e)}
- try{results=await getCollection("kiResults","createdAt",true)}catch(e){console.error(e)}
-
- assignments=assignments.filter(p=>p.module==="fpa" && p.type==="teacherAssignment");
- const praktikumsAuftraege=await getPraktikumsAuftraege();
  const meineBerichte=isTeacher()?{}:await getMeinePraktikumsberichte();
 
- return`${pageHead("SCHULE ↔ PRAXIS","fpA","Theorie-Praxis-Transfer-Aufträge und eigenständige Werkzeuge für die fachpraktische Ausbildung.",
- isTeacher()?`<button class="primary"onclick="openPracticeForm()">＋ Theorie-Praxis-Transfer-Auftrag</button>`:"")}
+ return`${pageHead("SCHULE ↔ PRAXIS","Blockphasen","Praktikumsphasen, Blockberichte und Ampel-Übersicht.","")}
  <style>
- .fpa-main{margin-bottom:18px}
- .fpa-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
- .fpa-tool{min-height:185px;cursor:pointer;transition:.15s;text-align:left;color:var(--ink);font:inherit}
- .fpa-tool:hover{transform:translateY(-2px)}
- .fpa-tool .emoji{font-size:30px;display:block;margin-bottom:10px}
- .fpa-tool strong{display:block;font-size:14px;color:var(--blue-dark);margin:0 0 6px}
- .fpa-tool small{display:block;font-size:12px;color:var(--muted);line-height:1.5}
- .fpa-count{margin-top:14px}
- .ki-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
- .ki-card{min-height:255px;cursor:pointer;transition:.15s;text-align:left;color:var(--ink);font:inherit}
- .ki-card:hover{transform:translateY(-2px)}
- .ki-card h2{font-size:16px;line-height:1.3;color:var(--blue-dark);margin:0 0 8px;font-weight:800}
- .ki-card p{font-size:12px;line-height:1.5;color:var(--muted);margin:0}
- .ki-step{font-size:27px;font-weight:800;margin-bottom:10px;color:var(--blue)}
- .ki-action{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px}
- .ki-process{margin-bottom:16px}
- .ki-process h3{font-size:16px;color:var(--blue-dark);margin:0 0 4px}
- .ki-process .grid strong{font-size:13px;color:var(--blue-dark)}
- .ki-process .grid small{font-size:12px;color:var(--muted);line-height:1.5}
- @media(max-width:850px){.fpa-tools{grid-template-columns:1fr}.ki-grid{grid-template-columns:1fr}}
  .pk-split{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;margin-bottom:22px}
  .pk-zeitstrahl{position:relative;padding-left:26px;margin:10px 0 0}
  .pk-kennzahlen{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
@@ -7745,8 +7854,8 @@ async function renderPraktikum(){
  </div>
 
  <div class="grid grid-4"style="margin-bottom:22px;gap:10px">
- <button type="button"class="card pk-kz"onclick="closeModal();const el=document.getElementById('fpaAuftraegeAnker');if(el){el.open=true;el.scrollIntoView({behavior:'smooth'})}">
- <strong>${assignments.length}</strong><small> Theorie-Praxis-Transfer-Aufträge</small>
+ <button type="button"class="card pk-kz"onclick="go('theorie-praxis-transfer')">
+ <strong>→</strong><small> Theorie-Praxis-Transfer-Aufträge</small>
  </button>
  <button type="button"class="card pk-kz"onclick="openFPAQuestions()">
  <strong>${questions.length}</strong><small> Fragen aus der Praxis</small>
@@ -7754,15 +7863,21 @@ async function renderPraktikum(){
  <button type="button"class="card pk-kz"onclick="openFPAProjects()">
  <strong>${projects.length}</strong><small> Projekte in der Praxis</small>
  </button>
- <button type="button"class="card pk-kz"onclick="go('ki')">
- <strong>${challenges.length}</strong><small> KI-Challenges</small>
+ <button type="button"class="card pk-kz"onclick="go('ki-partnerschaften')">
+ <strong>→</strong><small> KI-Innovationspartnerschaften</small>
  </button>
  </div>
+ ${footer()}`;
+}
 
- <details class="noten-collapsible"id="fpaAuftraegeAnker"style="margin-bottom:16px">
- <summary>BEREICH 1 · LEHRKRAFT → SCHÜLER: Theorie-Praxis-Transfer-Aufträge (${assignments.length})</summary>
- <div class="card"style="margin-top:8px;border-left:4px solid #4a90d9">
- <p style="margin-top:0">Hier erscheinen ausschließlich fpA-Theorie-Praxis-Transfer-Aufträge der Lehrkraft: beobachten, bearbeiten, durchführen.</p>
+async function renderTheoriePraxisTransfer(){
+ let assignments=[];
+ try{assignments=await getCollection("practice","createdAt",true)}catch(e){console.error(e)}
+ assignments=assignments.filter(p=>p.module==="fpa" && p.type==="teacherAssignment");
+ const praktikumsAuftraege=await getPraktikumsAuftraege();
+
+ return`${pageHead("SCHULE ↔ PRAXIS","Theorie-Praxis-Transfer",`${assignments.length} Aufträge der Lehrkraft: beobachten, bearbeiten, durchführen.`,
+ isTeacher()?`<button class="primary"onclick="openPracticeForm()">＋ Theorie-Praxis-Transfer-Auftrag</button>`:"")}
  <div class="grid grid-2">
  ${assignments.map(p=>`<article class="card">
  <span class="pill ${p.state==="offen"?"orange":"green"}">${esc(p.state||"offen")}</span>
@@ -7772,10 +7887,27 @@ async function renderPraktikum(){
  ${isTeacher()?`<div class="form-actions"style="margin-top:10px"><button class="secondary"onclick="deleteCampusEntry('practice','${p.id}','Theorie-Praxis-Transfer-Auftrag')">Löschen</button></div>`:""}
  </article>`).join("")||`<div class="empty">Noch keine Theorie-Praxis-Transfer-Aufträge vorhanden.</div>`}
  </div>
- </div>
- </details>
+ ${footer()}`;
+}
+window.renderTheoriePraxisTransfer=renderTheoriePraxisTransfer;
 
- <div class="kicker"style="margin:26px 0 8px">BEREICH 2 · KI-INNOVATIONSPARTNERSCHAFTEN</div>
+async function renderKIPartnerschaften(){
+ let challenges=[],solutions=[],results=[];
+ try{challenges=await getCollection("kiChallenges","createdAt",true)}catch(e){console.error(e)}
+ try{solutions=await getCollection("kiSolutions","createdAt",true)}catch(e){console.error(e)}
+ try{results=await getCollection("kiResults","createdAt",true)}catch(e){console.error(e)}
+
+ return`${pageHead("SCHULE ↔ PRAXIS","KI-Innovationspartnerschaften","Praxisproblem → Schülerteam → Ergebnis.","")}
+ <style>
+ .ki-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+ .ki-card{min-height:255px;cursor:pointer;transition:.15s;text-align:left;color:var(--ink);font:inherit}
+ .ki-card:hover{transform:translateY(-2px)}
+ .ki-card h2{font-size:16px;line-height:1.3;color:var(--blue-dark);margin:0 0 8px;font-weight:800}
+ .ki-card p{font-size:12px;line-height:1.5;color:var(--muted);margin:0}
+ .ki-step{font-size:27px;font-weight:800;margin-bottom:10px;color:var(--blue)}
+ .ki-action{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px}
+ @media(max-width:850px){.ki-grid{grid-template-columns:1fr}}
+ </style>
  <div class="ki-grid">
  <div class="card ki-card"style="background:#fff;border:2px solid #1688cf">
  <div class="ki-step">1</div>
@@ -7802,6 +7934,7 @@ async function renderPraktikum(){
  </div>
  ${footer()}`;
 }
+window.renderKIPartnerschaften=renderKIPartnerschaften;
 
 function openFPAQuestions(){
  let a=[];
@@ -8055,7 +8188,7 @@ function escapeICS(text){
 }
 
 function buildICS(events,calName){
- const lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//F11Sb//Kalender//DE","CALSCALE:GREGORIAN",`X-WR-CALNAME:${escapeICS(calName||"F11Sb Kalender")}`];
+ const lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//F11Sd//Kalender//DE","CALSCALE:GREGORIAN",`X-WR-CALNAME:${escapeICS(calName||"F11Sd Kalender")}`];
  const stamp=new Date().toISOString().replace(/[-:]/g,"").split(".")[0]+"Z";
  events.forEach((e,i)=>{
  const raw=e.start||e.date||e.startDate;
@@ -8069,7 +8202,7 @@ function buildICS(events,calName){
  nd.setDate(nd.getDate()+1);
  const dtEnd=`${nd.getFullYear()}${String(nd.getMonth()+1).padStart(2,"0")}${String(nd.getDate()).padStart(2,"0")}`;
  lines.push("BEGIN:VEVENT");
- lines.push(`UID:${e.id||("ck-"+i+"-"+dt)}@f11sb-weilheim`);
+ lines.push(`UID:${e.id||("ck-"+i+"-"+dt)}@f11sd-weilheim`);
  lines.push(`DTSTAMP:${stamp}`);
  lines.push(`DTSTART;VALUE=DATE:${dt}`);
  lines.push(`DTEND;VALUE=DATE:${dtEnd}`);
@@ -8113,7 +8246,11 @@ async function exportCampusCalendarICS(){
  const ferienRangeEvents=ferienZeitraeume.map(([start,end,label])=>(
  {start,rangeEnd:end,title:label,description:"Schulferien in Bayern"}
  ));
- downloadICS([...events,...birthdayEvents,...ferienRangeEvents],"campuskalender.ics","F11Sb Kalender");
+ const feiertagEventsICS=[
+ {start:"2027-05-06",title:"Christi Himmelfahrt",description:"Gesetzlicher Feiertag in Bayern."},
+ {start:"2027-05-17",title:"Pfingstmontag",description:"Gesetzlicher Feiertag in Bayern."}
+ ];
+ downloadICS([...events,...birthdayEvents,...ferienRangeEvents,...feiertagEventsICS],"campuskalender.ics","F11Sd Kalender");
  toast("Kalender wird heruntergeladen – Datei öffnen, um sie zum Handy-Kalender hinzuzufügen.");
  }catch(e){console.error("Kalender-Export:",e);toast("Der Kalender konnte nicht exportiert werden.")}
 }
@@ -8126,7 +8263,7 @@ function exportCalendarDayICS(y,m,d){
  return !isNaN(x)&&x.getFullYear()===y&&x.getMonth()===m&&x.getDate()===d;
  });
  if(!day.length){toast("An diesem Tag gibt es keinen Termin zum Exportieren.");return}
- downloadICS(day,`termin-${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}.ics`,"F11Sb Termin");
+ downloadICS(day,`termin-${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}.ics`,"F11Sd Termin");
 }
 
 async function renderKalender(){
@@ -8135,6 +8272,8 @@ async function renderKalender(){
  if(!events.length){
  try{events=(await getCollection("calendar","date",false)).map(e=>({...e,collection:"calendar"}))}catch(e){console.error("Kalender calendar:",e)}
  }
+ let news=[];
+ try{news=await getCollection("news","createdAt",true)}catch(e){console.error("Kalender news:",e)}
 
  const typeMeta={
  schulaufgabe:{label:"Schulaufgabe",className:"cal-blue"},
@@ -8144,7 +8283,9 @@ async function renderKalender(){
  praesentation:{label:"Präsentation",className:"cal-purple"},
  sonstiges:{label:"Sonstiger Termin",className:"cal-grey"},
  geburtstag:{label:"Geburtstag",className:"cal-birthday"},
- ferien:{label:"Schulferien Bayern",className:"cal-holiday"}
+ ferien:{label:"Schulferien Bayern",className:"cal-holiday"},
+ fpa:{label:"fpA-Abgabe",className:"cal-gold"},
+ feiertag:{label:"Gesetzlicher Feiertag",className:"cal-teal"}
  };
 
  // Schulferien Bayern – Schuljahr 2026/27.
@@ -8170,9 +8311,16 @@ async function renderKalender(){
  });
  }
  });
+ // Gesetzliche Feiertage in Bayern, die tatsächlich in die Schulzeit fallen
+ // (alle anderen liegen entweder in den o.g. Ferien oder auf einem
+ // Wochenende und sind daher hier nicht extra aufgeführt).
+ const feiertagEvents=[
+ {start:"2027-05-06",type:"feiertag",title:"Christi Himmelfahrt",description:"Gesetzlicher Feiertag in Bayern."},
+ {start:"2027-05-17",type:"feiertag",title:"Pfingstmontag",description:"Gesetzlicher Feiertag in Bayern."}
+ ];
  let birthdayEvents=[];
  try{birthdayEvents=await getBirthdayEvents()}catch(e){console.error("Kalender Geburtstage:",e)}
- events=[...events,...birthdayEvents,...ferienEvents];
+ events=[...events,...birthdayEvents,...ferienEvents,...feiertagEvents];
 
  const normalizeType=e=>{
  const raw=String(e?.type||e?.eventType||e?.category||"sonstiges").toLowerCase().trim();
@@ -8228,7 +8376,28 @@ async function renderKalender(){
  `<span class="cal-legend-item"><i class="cal-legend-dot ${v.className}"></i>${esc(v.label)}</span>`
  ).join("");
 
- const html=`${pageHead("ORGANISATION","Campus-Kalender","Das Schuljahr 26/27 auf einen Blick. Termine sind je nach Terminart farblich gekennzeichnet.",`${addButton}${birthdayButton}${exportButton}`)}
+ const html=`${pageHead("ORGANISATION","fpA Kalender","Das Schuljahr 26/27 auf einen Blick. Termine sind je nach Terminart farblich gekennzeichnet.",`${addButton}${birthdayButton}${exportButton}`)}
+ <div class="card"style="margin-bottom:16px;border-left:4px solid #4a90d9">
+ <strong style="font-size:16px">Willkommen, 11Sd! </strong>
+ <p style="margin:6px 0 0;color:var(--muted)">Hier findest du alle Termine rund um euer Praktikum – Abgabefristen, Feiertage, Ferien und Geburtstage auf einen Blick.</p>
+ </div>
+ ${news.length||isTeacher()?`<div class="card"style="margin-bottom:16px;border-left:4px solid #e0a324;background:#fdf6e8">
+ <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+ <strong> Campus-News</strong>
+ ${isTeacher()?`<button class="secondary"style="padding:4px 10px;font-size:12px"onclick="openNewsForm()">＋ News veröffentlichen</button>`:""}
+ </div>
+ ${news.length?news.slice(0,3).map(p=>`<div style="margin-top:10px;padding-top:10px;border-top:1px solid #eee1c2">
+ <strong style="display:block">${esc(p.title||p.text)}</strong>
+ ${p.title?`<small style="display:block;margin-top:2px">${esc(p.text)} · ${fmtDate(p.createdAt)}</small>`:`<small style="display:block;margin-top:2px">${fmtDate(p.createdAt)}</small>`}
+ <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+ ${isTeacher()?`<button class="secondary"style="padding:4px 10px;font-size:12px"onclick="openEditNewsForm('${p.id}','${esc(String(p.title||"").replace(/\n/g,"\\n"))}','${esc(String(p.text||"").replace(/\n/g,"\\n"))}')">Bearbeiten</button>`:""}
+ ${isAdmin()?`<button class="secondary"style="padding:4px 10px;font-size:12px"onclick="deleteNews('${p.id}')">Löschen</button>`:""}
+ </div>
+ </div>`).join(""):`<p style="margin:10px 0 0;color:var(--muted)">Noch keine News.</p>`}
+ </div>`:""}
+ <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+ ${Object.entries(typeMeta).map(([key,m])=>`<span class="pill ${m.className}"style="font-size:11px">${esc(m.label)}</span>`).join("")}
+ </div>
  <style>
  .cal-months{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
  .cal-month{padding:18px}.cal-month-head{margin-bottom:10px}
@@ -8244,6 +8413,8 @@ async function renderKalender(){
  .cal-yellow{background:#fef3c7!important}.cal-purple{background:#ede9fe!important}.cal-grey{background:#e5e7eb!important}
  .cal-holiday{background:#e3f5da!important;border-color:#8bc34a!important}
  .cal-birthday{background:#ffe4ec!important;border-color:#f472b6!important}
+ .cal-gold{background:#fdf0c8!important;border-color:#d4a017!important;font-weight:700!important}
+ .cal-teal{background:#c9ede6!important;border-color:#1a9b8e!important}
  .cal-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
  .cal-legend-item{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff;font-size:12px}
  .cal-legend-dot{width:13px;height:13px;border-radius:3px;border:1px solid rgba(0,0,0,.12)}
@@ -8315,7 +8486,7 @@ async function getBirthdayEvents(){
  return {
  start:dateStr,type:"geburtstag",
  title:` ${u.displayName||u.email||"Campus-Mitglied"} hat Geburtstag`,
- description:"Herzlichen Glückwunsch von der ganzen F11Sb!"
+ description:"Herzlichen Glückwunsch von der ganzen F11Sd!"
  };
  }).filter(Boolean);
  }catch(e){console.error("Geburtstage laden:",e);return []}
@@ -8345,6 +8516,20 @@ async function removeBirthday(){
 }
 window.removeBirthday=removeBirthday;
 
+async function adminRemoveBirthday(uid){
+ if(!isTeacher()){toast("Nur Lehrkräfte können fremde Geburtstage entfernen.");return}
+ if(!confirm("Diesen Geburtstag wirklich entfernen?"))return;
+ try{
+ await updateDoc(doc(db,"users",uid),{birthday:"",updatedAt:serverTimestamp()});
+ toast("Geburtstag entfernt.");
+ await render();
+ }catch(e){
+ console.error("Geburtstag (fremd) löschen:",e);
+ toast(e?.code==="permission-denied"?"Firebase verweigert das Entfernen. Bitte die Firestore-Regeln prüfen.":"Konnte nicht entfernt werden.");
+ }
+}
+window.adminRemoveBirthday=adminRemoveBirthday;
+
 async function saveBirthday(){
  const val=$("birthdayInput")?.value||"";
  if(!val){toast("Bitte ein Datum auswählen.");return}
@@ -8371,7 +8556,9 @@ function calendarTypeMeta(e){
  praesentation:{label:"Präsentation",className:"cal-purple"},
  sonstiges:{label:"Sonstiger Termin",className:"cal-grey"},
  geburtstag:{label:"Geburtstag",className:"cal-birthday"},
- ferien:{label:"Schulferien Bayern",className:"cal-holiday"}
+ ferien:{label:"Schulferien Bayern",className:"cal-holiday"},
+ fpa:{label:"fpA-Abgabe",className:"cal-gold"},
+ feiertag:{label:"Gesetzlicher Feiertag",className:"cal-teal"}
  })[key]||{label:"Sonstiger Termin",className:"cal-grey"};
 }
 
@@ -8454,7 +8641,10 @@ async function renderTeam(){
  <div class="team-history-meta">Gepostet von ${esc(u.authorName||"Lehrkraft")}</div>
  <p class="team-history-text">${esc(u.text||"")}</p>
  ${u.followUp?`<div class="notice"style="margin-top:10px"><strong>Nächster Schritt / Vereinbarung</strong><p style="margin-bottom:0;white-space:pre-wrap">${esc(u.followUp)}</p></div>`:""}
- <div class="form-actions"style="margin-top:10px"><button class="secondary"onclick="deleteCampusEntry('classTeamUpdates','${u.id}','Information')">Löschen</button></div>
+ <div class="form-actions"style="margin-top:10px">
+ <button class="secondary"style="padding:4px 10px;font-size:12px"onclick="openEditClassTeamUpdateForm('${u.id}','${esc(String(u.date||"").replace(/\n/g,"\\n"))}','${esc(u.type||"info")}','${esc(String(u.title||"").replace(/\n/g,"\\n"))}','${esc(String(u.text||"").replace(/\n/g,"\\n"))}','${esc(String(u.followUp||"").replace(/\n/g,"\\n"))}')">Bearbeiten</button>
+ <button class="secondary"style="padding:4px 10px;font-size:12px"onclick="deleteCampusEntry('classTeamUpdates','${u.id}','Information')">Löschen</button>
+ </div>
  </article>`;
  }).join("")||`<div class="empty">Noch keine Informationen dokumentiert.</div>`}
  </div>
@@ -8511,6 +8701,41 @@ async function saveClassTeamUpdate(){
  closeModal();await render();toast("Information für das Klassenteam gespeichert.");
  }catch(e){console.error("Klassenteam speichern:",e);toast("Information konnte nicht gespeichert werden.");}
 }
+function openEditClassTeamUpdateForm(id,date,type,title,text,followUp){
+ if(!isTeacher()){toast("Nur Lehrkräfte können Informationen bearbeiten.");return}
+ modal(`<button class="modal-close"onclick="closeModal()">×</button>
+ <div class="kicker">LEHRKRÄFTE KLASSENTEAM · BEARBEITEN</div><h2>Information bearbeiten</h2>
+ <div class="form">
+ <label>Datum<input id="ctDate"type="date"value="${esc(date)}"></label>
+ <label>Art<select id="ctType">
+ <option value="info"${type==="info"?" selected":""}>Information</option><option value="vorkommnis"${type==="vorkommnis"?" selected":""}>Vorkommnis</option>
+ <option value="vereinbarung"${type==="vereinbarung"?" selected":""}>Vereinbarung</option><option value="beobachtung"${type==="beobachtung"?" selected":""}>Beobachtung</option>
+ <option value="wichtig"${type==="wichtig"?" selected":""}>Wichtig</option><option value="sonstiges"${type==="sonstiges"?" selected":""}>Sonstiges</option>
+ </select></label>
+ <label>Titel<input id="ctTitle"value="${esc(title)}"required></label>
+ <label>Information<textarea id="ctText"rows="6"required>${esc(text)}</textarea></label>
+ <div style="margin-top:-8px;margin-bottom:10px">${emojiPickerHTML("ctText","emojiPickerClassTeam")}</div>
+ <label>Nächster Schritt / Vereinbarung (optional)<textarea id="ctFollowUp"rows="3">${esc(followUp)}</textarea></label>
+ <div class="form-actions"><button class="secondary"onclick="closeModal()">Abbrechen</button>
+ <button class="primary"onclick="saveClassTeamUpdateEdit('${id}')">Speichern</button></div>
+ </div>`);
+}
+window.openEditClassTeamUpdateForm=openEditClassTeamUpdateForm;
+async function saveClassTeamUpdateEdit(id){
+ if(!isTeacher()){toast("Nur Lehrkräfte können Informationen bearbeiten.");return}
+ const title=$("ctTitle")?.value.trim()||"", body=$("ctText")?.value.trim()||"";
+ if(!title||!body){toast("Bitte Titel und Information ausfüllen.");return}
+ try{
+ await updateDoc(doc(db,"classTeamUpdates",id),{
+ date:$("ctDate")?.value||new Date().toISOString().slice(0,10),
+ type:$("ctType")?.value||"info",title,text:body,
+ followUp:$("ctFollowUp")?.value.trim()||"",
+ updatedAt:serverTimestamp()
+ });
+ closeModal();await render();toast("Information aktualisiert.");
+ }catch(e){console.error("Klassenteam bearbeiten:",e);toast(e?.code==="permission-denied"?"Firebase verweigert das Speichern. Bitte die Firestore-Regeln prüfen.":"Information konnte nicht gespeichert werden.");}
+}
+window.saveClassTeamUpdateEdit=saveClassTeamUpdateEdit;
 
 
 const LERNMETHODEN=[
@@ -8853,7 +9078,7 @@ nächste Schritt sinnvoll sein kann.</p>
 
 
 /* =========================================================
- F11Sb – LERNIMPULSE
+ F11Sd – LERNIMPULSE
  Zwei Zugänge:
  1. Gezielte Auswahl
  2. Lern-Glücksrad
@@ -8921,10 +9146,10 @@ const lernImpulse=[
 ];
 
 function lernImpulseDone(){
- try{return JSON.parse(localStorage.getItem("f11sb_lernimpulse_done")||"[]")}catch(e){return []}
+ try{return JSON.parse(localStorage.getItem("f11sd_lernimpulse_done")||"[]")}catch(e){return []}
 }
 function lernImpulseSaveDone(ids){
- try{localStorage.setItem("f11sb_lernimpulse_done",JSON.stringify(ids))}catch(e){}
+ try{localStorage.setItem("f11sd_lernimpulse_done",JSON.stringify(ids))}catch(e){}
 }
 function lernImpulseCategory(id){return lernImpulseKategorien.find(x=>x.id===id)}
 function renderLernimpulsCard(i){
@@ -9020,7 +9245,7 @@ window.completeLernimpuls=completeLernimpuls;
 
 
 /* =========================================================
- F11Sb – LERNSTANDSMESSUNG PP 11
+ F11Sd – LERNSTANDSMESSUNG PP 11
  26 Lernstandsmessungen
  5 identische Kompetenzdimensionen × 3 Punkte = 15 Punkte
  ========================================================= */
@@ -9762,7 +9987,7 @@ async function downloadLernstandResultPDF(id){
  return`<div class="item"><strong>${escPDF(String(i+1)+"."+q.label)} · ${q.points} P.</strong><div><em>Aufgabe:</em> ${escPDF(q.prompt||"")}</div><div style="margin-top:6px"><em>Musterlösung:</em><br>${escPDF(q.solution||"Noch keine Musterlösung hinterlegt.").replace(/\n/g,"<br>")}</div></div>`;
  }).join("");
  openToolPrintWindow(
- "Lernstandsmessung – "+(t.title||"Thema"),`<div class="item"style="background:#f5f7f8"><strong>${escPDF(scoreLine)}</strong></div>`+body,"F11Sb · Lernstandsmessung"+t.nr+"/26 · "+(LERNSTAND_AREAS[t.learningArea]?.title||"")
+ "Lernstandsmessung – "+(t.title||"Thema"),`<div class="item"style="background:#f5f7f8"><strong>${escPDF(scoreLine)}</strong></div>`+body,"F11Sd · Lernstandsmessung"+t.nr+"/26 · "+(LERNSTAND_AREAS[t.learningArea]?.title||"")
  );
  }catch(e){console.error("Lernstand PDF:",e);toast("Das PDF konnte nicht erstellt werden.")}
 }
@@ -9854,7 +10079,7 @@ async function downloadLernstandTeacherPDF(attemptId){
  }).join("");
  const scoreLine=a.status==="bewertet"?`Gesamt: ${a.total}/${max} Punkte (${lernstandStatusText(a.total,max)})`:`Gesamt bisher: ${Number(a.total)||0}/${max} Punkte (noch nicht vollständig bewertet)`;
  openToolPrintWindow(
- "Bewertungsbericht – "+(t.title||"Thema"),`<div class="item"style="background:#f5f7f8"><strong>${escPDF(a.displayName||"Schüler/in")} · Versuch ${a.attempt}/3</strong><br>${escPDF(scoreLine)}${a.feedback?`<br><em>Rückmeldung:</em> ${escPDF(a.feedback)}`:""}</div>`+body,"F11Sb · Lernstandsmessung"+t.nr+"/26 · "+(LERNSTAND_AREAS[t.learningArea]?.title||"")
+ "Bewertungsbericht – "+(t.title||"Thema"),`<div class="item"style="background:#f5f7f8"><strong>${escPDF(a.displayName||"Schüler/in")} · Versuch ${a.attempt}/3</strong><br>${escPDF(scoreLine)}${a.feedback?`<br><em>Rückmeldung:</em> ${escPDF(a.feedback)}`:""}</div>`+body,"F11Sd · Lernstandsmessung"+t.nr+"/26 · "+(LERNSTAND_AREAS[t.learningArea]?.title||"")
  );
  }catch(e){console.error("Lernstand-Bewertungsbericht PDF:",e);toast("Das PDF konnte nicht erstellt werden.")}
 }
@@ -9932,33 +10157,16 @@ async function render(){
  if(liveUnsubHeimat){liveUnsubHeimat();liveUnsubHeimat=null;}
  if(liveUnsubMiniKalender){liveUnsubMiniKalender();liveUnsubMiniKalender=null;}
  const seq=++__campusRenderSeq;
- const p=location.hash.replace("#","")||"start";
+ const p=location.hash.replace("#","")||"kalender";
  const pages={
- start:renderStart,klassenteam:renderKlassenteam,kompass:renderKompass,lernwerkstatt:renderLernwerkstatt,"ki-lernen":renderKILernen,
- faecher:renderFaecherUebersicht,fach:renderFachDetail,
- ressourcen:renderRessourcenRoute,lernpfad:renderLernpfadRoute,forum:renderForum,"forum-board":renderForumBoard,"forum-nachrichten":renderForumMessages,
- pinnwand:renderPinnwandUebersicht,"pinnwand-board":renderPinnwandBoard,
- kollaboration:renderKollaborationsTools,
- wortwolke:renderWortwolkeUebersicht,"wortwolke-board":renderWortwolkeBoard,
- kanban:renderKanbanUebersicht,"kanban-board":renderKanbanBoard,
- terminfindung:renderTerminfindungUebersicht,"terminfindung-board":renderTerminfindungBoard,
- teamgesucht:renderTeamgesuchtUebersicht,
- checkliste:renderChecklisteUebersicht,"checkliste-board":renderChecklisteBoard,
- ampel:renderAmpelUebersicht,"ampel-board":renderAmpelBoard,
- umfrage:renderUmfrageUebersicht,"umfrage-board":renderUmfrageBoard,
- zufallspicker:renderZufallspicker,
- lernwerkzeuge:renderLernWerkzeuge,
- karteikarten:renderKarteikartenUebersicht,"karteikarten-board":renderKarteikartenBoard,"fokus-timer":renderFokusTimer,"uhr-timer":renderUhrTimer,
- glossar:renderGlossar,
- fachaufsatz:renderFachaufsatzUebersicht,"fachaufsatz-board":renderFachaufsatzBoard,
- projekte:renderProjekte,kompetenz:renderKompetenz,journal:renderLernjournalRoute,
- praktikum:renderPraktikum,resilienz:renderResilienz,praxisfragen:renderPraxisFragen,fragenhilfe:renderFragenHilfe,
- praxisprojekte:renderPraxisProjekte,ki:renderKI,kalender:renderKalender,team:renderTeam,
- impulse:renderLernimpulse,lernstand:renderLernstand,
- kompetenzprofil:()=>modulePlaceholder("Kompetenzprofil"),methoden:renderLernmethoden,lernstrategien:renderLernstrategienTest,metakognition:renderMetakognition,
- lerncoaching:renderLerncoaching
+ praktikum:renderPraktikum,"theorie-praxis-transfer":renderTheoriePraxisTransfer,"ki-partnerschaften":renderKIPartnerschaften,
+ praktikumsbesuche:renderPraktikumsbesuche,
+ kalender:renderKalender
  };
- const fn=pages[p]||renderStart;
+ // Diese App zeigt bewusst nur den fpA-Anteil – alle anderen Routen (aus
+ // der F11Sb-Basis mitkopiert, aber hier nicht vorgesehen) leiten zu fpA
+ // um, statt über die Adresszeile erreichbar zu sein.
+ const fn=pages[p]||renderKalender;
  document.querySelectorAll(".nav-link").forEach(a=>a.classList.toggle("active",
  a.dataset.page===p || (a.dataset.page==="forum" && p.startsWith("forum-"))));
  const content=$("content");
@@ -10034,7 +10242,7 @@ async function render(){
  }catch(e){
  if(seq!==__campusRenderSeq)return;
  console.error("Campus-Seitenfehler:",e);
- content.innerHTML=`<div class="card"><h3>Die Seite konnte nicht geladen werden.</h3><p>${esc(e?.message||"Unbekannter Fehler")}</p><button class="primary"onclick="go('start')">← Zur Startseite</button></div>`;
+ content.innerHTML=`<div class="card"><h3>Die Seite konnte nicht geladen werden.</h3><p>${esc(e?.message||"Unbekannter Fehler")}</p><button class="primary"onclick="go('kalender')">← Zum fpA Kalender</button></div>`;
  window.scrollTo(0,0);
  }
  updateTeacherTeamNav();
@@ -10042,14 +10250,14 @@ async function render(){
 }
 
 function modulePlaceholder(title){
- return`${pageHead("CAMPUS-MODUL",title,"Dieser Bereich ist in der Master-Struktur vorbereitet.",`<button class="secondary"onclick="go('start')">← Startseite</button>`)}
+ return`${pageHead("CAMPUS-MODUL",title,"Dieser Bereich ist in der Master-Struktur vorbereitet.",`<button class="secondary"onclick="go('kalender')">← fpA Kalender</button>`)}
  <div class="card"><span class="badge"> VORBEREITET</span><h2>${title}</h2><p>Dieser Bereich wird später als eigenes Modul
 entwickelt. Die übrige Campus-App bleibt dabei unverändert.</p></div>${footer()}`;
 }
 
 
 /* =========================================================
- F11Sb – MODAL BRIDGE
+ F11Sd – MODAL BRIDGE
  app.js wird als ES-Modul geladen. Funktionen aus einem
  ES-Modul sind nicht automatisch window-global.
  Die bestehenden Modal-Formulare verwenden jedoch inline
@@ -10312,7 +10520,7 @@ window.CampusFirebase.modal=modal;
 window.CampusFirebase.toast=toast;
 
 window.addEventListener("hashchange",()=>render());
-window.go=p=>{const target=String(p||"start"); if(location.hash!=="#"+target) location.hash=target; else render();};
+window.go=p=>{const target=String(p||"kalender"); if(location.hash!=="#"+target) location.hash=target; else render();};
 
 function openTaskForm(){
  modal(`<button class="modal-close"onclick="closeModal()">×</button><div class="kicker">CAMPUS-KOMPASS</div><h2>Neue
@@ -10337,6 +10545,18 @@ async function addNews(){
  if(!title||!text){toast("Bitte Überschrift und News eingeben.");return}
  try{await addDoc(collection(db,"news"),{authorUid:currentUser.uid,authorName:profile?.displayName||currentUser?.email||"Lehrkraft",title,text,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});closeModal();await render();toast("News veröffentlicht.")}catch(e){console.error(e);toast("News konnte nicht veröffentlicht werden.")}
 }
+function openEditNewsForm(id,title,text){
+ if(!isTeacher()){toast("Nur Lehrkräfte können News bearbeiten.");return}
+ modal(`<button class="modal-close"onclick="closeModal()">×</button><div class="kicker">CAMPUS-NEWS · BEARBEITEN</div><h2>News bearbeiten</h2><div class="form"><label>Überschrift<input id="newsTitle"value="${esc(title)}"required></label><label>News<textarea id="newsText"rows="6"required>${esc(text)}</textarea></label><div style="margin-top:-8px;margin-bottom:10px">${emojiPickerHTML("newsText","emojiPickerNews")}</div><div class="form-actions"><button class="secondary"onclick="closeModal()">Abbrechen</button><button class="primary"onclick="saveNewsEdit('${id}')">Speichern</button></div></div>`);
+}
+window.openEditNewsForm=openEditNewsForm;
+async function saveNewsEdit(id){
+ if(!isTeacher()){toast("Nur Lehrkräfte können News bearbeiten.");return}
+ const title=$("newsTitle")?.value.trim()||"",text=$("newsText")?.value.trim()||"";
+ if(!title||!text){toast("Bitte Überschrift und News eingeben.");return}
+ try{await updateDoc(doc(db,"news",id),{title,text,updatedAt:serverTimestamp()});closeModal();await render();toast("News aktualisiert.")}catch(e){console.error(e);toast(e?.code==="permission-denied"?"Firebase verweigert das Speichern. Bitte die Firestore-Regeln prüfen.":"News konnte nicht gespeichert werden.")}
+}
+window.saveNewsEdit=saveNewsEdit;
 
 // ---- Emoji-Picker (wiederverwendbar für Forum-Beiträge und Nachrichten) --
 const EMOJI_PICKER_LISTE=["😀","😂","🥰","😅","😉","🙂","😊","😍","🤔","😮","😢","😡","👍","👎","❤️","🔥","🎉","👏","🙏","💡","✅","❌","🤝","🚀","📚","🎓","😴","🥳","💪","👀"];
@@ -10700,6 +10920,7 @@ function openCalendarForm(){
  <option value="projektvorstellung">Projektvorstellung</option>
  <option value="referat">Referat</option>
  <option value="praesentation">Präsentation</option>
+ <option value="fpa">fpA-Abgabe</option>
  <option value="sonstiges">Sonstiger Termin / frei wählbar</option>
  </select>
  </label>
@@ -10757,6 +10978,7 @@ function editCalendarEntry(collectionName,id,title,type,date,time,location,descr
  <option value="projektvorstellung">Projektvorstellung</option>
  <option value="referat">Referat</option>
  <option value="praesentation">Präsentation</option>
+ <option value="fpa">fpA-Abgabe</option>
  <option value="sonstiges">Sonstiger Termin / frei wählbar</option>
  </select>
  </label>
