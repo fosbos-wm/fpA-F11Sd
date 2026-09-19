@@ -2119,7 +2119,8 @@ async function renderPraktikumsbesuche(){
  return`${pageHead("FPA · TERMINPLANUNG","Praktikumsbesuche",`Route und Termine für die Besuche in den Praktikumsstellen. ${geplant} von ${besuche.length} Terminen bereits festgelegt.`,isTeacher()?`<button class="primary"onclick="openPraktikumsbesuchForm()">＋ Praktikumsstelle</button> <button class="secondary"onclick="openPraktikumsbesucheImport()"> Route importieren</button>`:"")}
  ${!besuche.length?`<div class="empty"><strong>Noch keine Praktikumsstellen eingetragen.</strong>${isTeacher()?"Sobald die Adressliste vorliegt, wird hier eine sinnvolle Route (nahe beieinanderliegende Orte hintereinander) vorgeschlagen – du musst dann nur noch Uhrzeit je Station eintragen.":"Die Lehrkraft plant die Besuchsroute – hier erscheinen die Termine, sobald sie feststehen."}</div>`
  :`<div class="kicker"style="margin-bottom:10px">MEINE ROUTE · ${besuche.length} STATIONEN</div>
- <div class="pk-zeitstrahl">${besuche.map(b=>{
+ <style>.route-liste .pk-summary{padding-left:34px}</style>
+ <div class="pk-zeitstrahl route-liste">${besuche.map(b=>{
  const istMeins=!isTeacher()&&(b.schueler||"").toLowerCase().trim()===(profile?.displayName||"").toLowerCase().trim();
  return`<div class="pk-node"style="border-left:4px solid ${isTeacher()?"#4a90d9":istMeins?"#3fa66a":"#e2eaf0"}">
  <div class="pk-summary"style="cursor:default">
@@ -2132,7 +2133,7 @@ async function renderPraktikumsbesuche(){
  </div>
  ${isTeacher()?`<button type="button"class="secondary"style="padding:4px 8px;font-size:11px"onclick="openPraktikumsbesuchForm('${b.id}')">Bearbeiten</button>`:""}
  </div>
- ${isTeacher()?`<div style="display:flex;gap:8px;align-items:center;padding:0 12px 10px 40px;flex-wrap:wrap">
+ ${isTeacher()?`<div style="display:flex;gap:8px;align-items:center;padding:0 12px 10px 54px;flex-wrap:wrap">
  <input type="date"id="pbeDatumInline_${b.id}"value="${b.datum||""}"style="font-size:12px;padding:4px 6px">
  <input type="time"id="pbeUhrzeitInline_${b.id}"value="${b.uhrzeit||""}"style="font-size:12px;padding:4px 6px">
  <button type="button"class="secondary"style="padding:4px 8px;font-size:11px"onclick="saveBesuchTermin('${b.id}')">Termin speichern</button>
@@ -7838,7 +7839,7 @@ async function renderPraktikum(){
  </summary>
  <div class="pk-body">
  <small>Abgabe Blockbericht + Arbeitszeiten-Nachweis: <strong>${esc(fmtDateOnly(frist))}, 19 Uhr</strong></small>
- ${typen.length>1?`<small>Abgabe Einschätzungsbogen: <strong>${esc(fmtDateOnly(einschaetzungFrist(p.id)))}, 19 Uhr</strong></small>`:""}
+ ${typen.some(t=>t.typ==="einschaetzung")?`<small>Abgabe Einschätzungsbogen: <strong>${esc(fmtDateOnly(einschaetzungFrist(p.id)))}, 19 Uhr</strong></small>`:""}
  <button class="secondary"style="margin-top:8px;font-size:11px"onclick="${isTeacher()?`openLehrkraftPraktikumsUebersicht('${p.id}')`:`openPraktikumsblockDetail('${p.id}')`}">${isTeacher()?"Klassenübersicht öffnen":"Berichte hochladen/ansehen"} →</button>
  </div>
  </details>`;
