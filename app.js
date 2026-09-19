@@ -7777,42 +7777,13 @@ function renderPraxisProjekte(){
 }
 
 async function renderPraktikum(){
- let assignments=[], questions=[], projects=[];
- let challenges=[],solutions=[],results=[];
- try{assignments=await getCollection("practice","createdAt",true)}catch(e){console.error(e)}
+ let questions=[],projects=[];
  try{questions=await getCollection("fpaQuestions","createdAt",true)}catch(e){console.error(e)}
  try{projects=await getCollection("fpaProjects","createdAt",true)}catch(e){console.error(e)}
- try{challenges=await getCollection("kiChallenges","createdAt",true)}catch(e){console.error(e)}
- try{solutions=await getCollection("kiSolutions","createdAt",true)}catch(e){console.error(e)}
- try{results=await getCollection("kiResults","createdAt",true)}catch(e){console.error(e)}
-
- assignments=assignments.filter(p=>p.module==="fpa" && p.type==="teacherAssignment");
- const praktikumsAuftraege=await getPraktikumsAuftraege();
  const meineBerichte=isTeacher()?{}:await getMeinePraktikumsberichte();
 
- return`${pageHead("SCHULE ↔ PRAXIS","fpA","Theorie-Praxis-Transfer-Aufträge und eigenständige Werkzeuge für die fachpraktische Ausbildung.",
- isTeacher()?`<button class="primary"onclick="openPracticeForm()">＋ Theorie-Praxis-Transfer-Auftrag</button>`:"")}
+ return`${pageHead("SCHULE ↔ PRAXIS","Blockphasen","Praktikumsphasen, Blockberichte und Ampel-Übersicht.","")}
  <style>
- .fpa-main{margin-bottom:18px}
- .fpa-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
- .fpa-tool{min-height:185px;cursor:pointer;transition:.15s;text-align:left;color:var(--ink);font:inherit}
- .fpa-tool:hover{transform:translateY(-2px)}
- .fpa-tool .emoji{font-size:30px;display:block;margin-bottom:10px}
- .fpa-tool strong{display:block;font-size:14px;color:var(--blue-dark);margin:0 0 6px}
- .fpa-tool small{display:block;font-size:12px;color:var(--muted);line-height:1.5}
- .fpa-count{margin-top:14px}
- .ki-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
- .ki-card{min-height:255px;cursor:pointer;transition:.15s;text-align:left;color:var(--ink);font:inherit}
- .ki-card:hover{transform:translateY(-2px)}
- .ki-card h2{font-size:16px;line-height:1.3;color:var(--blue-dark);margin:0 0 8px;font-weight:800}
- .ki-card p{font-size:12px;line-height:1.5;color:var(--muted);margin:0}
- .ki-step{font-size:27px;font-weight:800;margin-bottom:10px;color:var(--blue)}
- .ki-action{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px}
- .ki-process{margin-bottom:16px}
- .ki-process h3{font-size:16px;color:var(--blue-dark);margin:0 0 4px}
- .ki-process .grid strong{font-size:13px;color:var(--blue-dark)}
- .ki-process .grid small{font-size:12px;color:var(--muted);line-height:1.5}
- @media(max-width:850px){.fpa-tools{grid-template-columns:1fr}.ki-grid{grid-template-columns:1fr}}
  .pk-split{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;margin-bottom:22px}
  .pk-zeitstrahl{position:relative;padding-left:26px;margin:10px 0 0}
  .pk-kennzahlen{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
@@ -7883,8 +7854,8 @@ async function renderPraktikum(){
  </div>
 
  <div class="grid grid-4"style="margin-bottom:22px;gap:10px">
- <button type="button"class="card pk-kz"onclick="closeModal();const el=document.getElementById('fpaAuftraegeAnker');if(el){el.open=true;el.scrollIntoView({behavior:'smooth'})}">
- <strong>${assignments.length}</strong><small> Theorie-Praxis-Transfer-Aufträge</small>
+ <button type="button"class="card pk-kz"onclick="go('theorie-praxis-transfer')">
+ <strong>→</strong><small> Theorie-Praxis-Transfer-Aufträge</small>
  </button>
  <button type="button"class="card pk-kz"onclick="openFPAQuestions()">
  <strong>${questions.length}</strong><small> Fragen aus der Praxis</small>
@@ -7892,15 +7863,21 @@ async function renderPraktikum(){
  <button type="button"class="card pk-kz"onclick="openFPAProjects()">
  <strong>${projects.length}</strong><small> Projekte in der Praxis</small>
  </button>
- <button type="button"class="card pk-kz"onclick="openKIChallengesLibrary()">
- <strong>${challenges.length}</strong><small> KI-Challenges</small>
+ <button type="button"class="card pk-kz"onclick="go('ki-partnerschaften')">
+ <strong>→</strong><small> KI-Innovationspartnerschaften</small>
  </button>
  </div>
+ ${footer()}`;
+}
 
- <details class="noten-collapsible"id="fpaAuftraegeAnker"style="margin-bottom:16px">
- <summary>BEREICH 1 · LEHRKRAFT → SCHÜLER: Theorie-Praxis-Transfer-Aufträge (${assignments.length})</summary>
- <div class="card"style="margin-top:8px;border-left:4px solid #4a90d9">
- <p style="margin-top:0">Hier erscheinen ausschließlich fpA-Theorie-Praxis-Transfer-Aufträge der Lehrkraft: beobachten, bearbeiten, durchführen.</p>
+async function renderTheoriePraxisTransfer(){
+ let assignments=[];
+ try{assignments=await getCollection("practice","createdAt",true)}catch(e){console.error(e)}
+ assignments=assignments.filter(p=>p.module==="fpa" && p.type==="teacherAssignment");
+ const praktikumsAuftraege=await getPraktikumsAuftraege();
+
+ return`${pageHead("SCHULE ↔ PRAXIS","Theorie-Praxis-Transfer",`${assignments.length} Aufträge der Lehrkraft: beobachten, bearbeiten, durchführen.`,
+ isTeacher()?`<button class="primary"onclick="openPracticeForm()">＋ Theorie-Praxis-Transfer-Auftrag</button>`:"")}
  <div class="grid grid-2">
  ${assignments.map(p=>`<article class="card">
  <span class="pill ${p.state==="offen"?"orange":"green"}">${esc(p.state||"offen")}</span>
@@ -7910,12 +7887,28 @@ async function renderPraktikum(){
  ${isTeacher()?`<div class="form-actions"style="margin-top:10px"><button class="secondary"onclick="deleteCampusEntry('practice','${p.id}','Theorie-Praxis-Transfer-Auftrag')">Löschen</button></div>`:""}
  </article>`).join("")||`<div class="empty">Noch keine Theorie-Praxis-Transfer-Aufträge vorhanden.</div>`}
  </div>
- </div>
- </details>
+ ${footer()}`;
+}
+window.renderTheoriePraxisTransfer=renderTheoriePraxisTransfer;
 
- <details class="noten-collapsible">
- <summary>BEREICH 2 · KI-INNOVATIONSPARTNERSCHAFTEN</summary>
- <div class="ki-grid"style="margin-top:8px">
+async function renderKIPartnerschaften(){
+ let challenges=[],solutions=[],results=[];
+ try{challenges=await getCollection("kiChallenges","createdAt",true)}catch(e){console.error(e)}
+ try{solutions=await getCollection("kiSolutions","createdAt",true)}catch(e){console.error(e)}
+ try{results=await getCollection("kiResults","createdAt",true)}catch(e){console.error(e)}
+
+ return`${pageHead("SCHULE ↔ PRAXIS","KI-Innovationspartnerschaften","Praxisproblem → Schülerteam → Ergebnis.","")}
+ <style>
+ .ki-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+ .ki-card{min-height:255px;cursor:pointer;transition:.15s;text-align:left;color:var(--ink);font:inherit}
+ .ki-card:hover{transform:translateY(-2px)}
+ .ki-card h2{font-size:16px;line-height:1.3;color:var(--blue-dark);margin:0 0 8px;font-weight:800}
+ .ki-card p{font-size:12px;line-height:1.5;color:var(--muted);margin:0}
+ .ki-step{font-size:27px;font-weight:800;margin-bottom:10px;color:var(--blue)}
+ .ki-action{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px}
+ @media(max-width:850px){.ki-grid{grid-template-columns:1fr}}
+ </style>
+ <div class="ki-grid">
  <div class="card ki-card"style="background:#fff;border:2px solid #1688cf">
  <div class="ki-step">1</div>
  <h2>Praxisproblem<br>Herausforderungen im Praktikumsbetrieb</h2>
@@ -7939,9 +7932,9 @@ async function renderPraktikum(){
  <div class="ki-action"><span class="pill">${results.length} Ergebnisse</span><span class="pill">Öffnen →</span></div>
  </button>
  </div>
- </details>
  ${footer()}`;
 }
+window.renderKIPartnerschaften=renderKIPartnerschaften;
 
 function openFPAQuestions(){
  let a=[];
@@ -10146,7 +10139,8 @@ async function render(){
  const seq=++__campusRenderSeq;
  const p=location.hash.replace("#","")||"praktikum";
  const pages={
- praktikum:renderPraktikum,praktikumsbesuche:renderPraktikumsbesuche,
+ praktikum:renderPraktikum,"theorie-praxis-transfer":renderTheoriePraxisTransfer,"ki-partnerschaften":renderKIPartnerschaften,
+ praktikumsbesuche:renderPraktikumsbesuche,
  kalender:renderKalender
  };
  // Diese App zeigt bewusst nur den fpA-Anteil – alle anderen Routen (aus
