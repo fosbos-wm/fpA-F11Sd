@@ -8392,7 +8392,7 @@ async function renderKalender(){
  </div>
  </div>`).join(""):`<p style="margin:10px 0 0;color:var(--muted)">Noch keine News.</p>`}
  </div>`:""}
- <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">${addButton}${exportButton}</div>
+ <div class="card"style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 16px;margin-bottom:16px;border-left:4px solid #4a90d9">${addButton}${exportButton}</div>
  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
  ${Object.entries(typeMeta).map(([key,m])=>`<span class="pill ${m.className}"style="font-size:11px">${esc(m.label)}</span>`).join("")}
  </div>
@@ -8407,12 +8407,13 @@ async function renderKalender(){
  .cal-num{display:block;font-size:14px;flex:0 0 auto}
  .cal-event-type{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;font-size:9.5px;line-height:1.25;margin-top:4px;font-weight:700;word-break:break-word}
  .cal-count{position:absolute;right:5px;bottom:5px;font-size:10px;background:rgba(255,255,255,.8);border-radius:10px;padding:1px 5px}
- .cal-blue{background:#dbeafe!important}.cal-red{background:#fee2e2!important}.cal-green{background:#dcfce7!important}
- .cal-yellow{background:#fef3c7!important}.cal-purple{background:#ede9fe!important}.cal-grey{background:#e5e7eb!important}
- .cal-holiday{background:#e3f5da!important;border-color:#8bc34a!important}
- .cal-birthday{background:#ffe4ec!important;border-color:#f472b6!important}
- .cal-gold{background:#fdf0c8!important;border-color:#d4a017!important;font-weight:700!important}
- .cal-teal{background:#c9ede6!important;border-color:#1a9b8e!important}
+ .cal-green{background:#dcfce7!important;border:1.5px solid #3fa66a!important}
+ .cal-yellow{background:#fdecc7!important;border:1.5px solid #e0a324!important}
+ .cal-purple{background:#ede4f7!important;border:1.5px solid #9b59b6!important}
+ .cal-grey{background:#eceff1!important;border:1.5px solid #8a99a6!important}
+ .cal-holiday{background:#e3f5da!important;border:1.5px solid #8bc34a!important}
+ .cal-gold{background:#fdf0c8!important;border:1.5px solid #d4a017!important;font-weight:700!important}
+ .cal-teal{background:#d9f2ee!important;border:1.5px solid #1a9b8e!important}
  .cal-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
  .cal-legend-item{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff;font-size:12px}
  .cal-legend-dot{width:13px;height:13px;border-radius:3px;border:1px solid rgba(0,0,0,.12)}
