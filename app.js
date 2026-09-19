@@ -8279,8 +8279,6 @@ async function renderKalender(){
  try{news=await getCollection("news","createdAt",true)}catch(e){console.error("Kalender news:",e)}
 
  const typeMeta={
- schulaufgabe:{label:"Schulaufgabe",className:"cal-blue"},
- kurzarbeit:{label:"Kurzarbeit",className:"cal-red"},
  projektvorstellung:{label:"Projektvorstellung",className:"cal-green"},
  referat:{label:"Referat",className:"cal-yellow"},
  praesentation:{label:"Präsentation",className:"cal-purple"},
@@ -8375,7 +8373,7 @@ async function renderKalender(){
  `<span class="cal-legend-item"><i class="cal-legend-dot ${v.className}"></i>${esc(v.label)}</span>`
  ).join("");
 
- const html=`${pageHead("ORGANISATION","fpA Kalender","Das Schuljahr 26/27 auf einen Blick. Termine sind je nach Terminart farblich gekennzeichnet.",`${addButton}${exportButton}`)}
+ const html=`${pageHead("ORGANISATION","fpA Kalender","Das Schuljahr 26/27 auf einen Blick. Termine sind je nach Terminart farblich gekennzeichnet.")}
  <div class="card"style="margin-bottom:16px;border-left:4px solid #4a90d9">
  <strong style="font-size:16px">Willkommen, 11Sd! </strong>
  <p style="margin:6px 0 0;color:var(--muted)">Hier findest du alle Termine rund um euer Praktikum – Abgabefristen, Feiertage, Ferien und Geburtstage auf einen Blick.</p>
@@ -8394,6 +8392,7 @@ async function renderKalender(){
  </div>
  </div>`).join(""):`<p style="margin:10px 0 0;color:var(--muted)">Noch keine News.</p>`}
  </div>`:""}
+ <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">${addButton}${exportButton}</div>
  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
  ${Object.entries(typeMeta).map(([key,m])=>`<span class="pill ${m.className}"style="font-size:11px">${esc(m.label)}</span>`).join("")}
  </div>
@@ -8547,8 +8546,6 @@ function calendarTypeMeta(e){
  const raw=String(e?.type||e?.eventType||e?.category||"sonstiges").toLowerCase().trim();
  const key=raw==="präsentation"?"praesentation":raw;
  return ({
- schulaufgabe:{label:"Schulaufgabe",className:"cal-blue"},
- kurzarbeit:{label:"Kurzarbeit",className:"cal-red"},
  projektvorstellung:{label:"Projektvorstellung",className:"cal-green"},
  referat:{label:"Referat",className:"cal-yellow"},
  praesentation:{label:"Präsentation",className:"cal-purple"},
@@ -10912,8 +10909,6 @@ function openCalendarForm(){
  <label>Titel *<input id="calTitle"type="text"placeholder="z. B. Schulaufgabe Pädagogik"required></label>
  <label>Terminart *
  <select id="calType">
- <option value="schulaufgabe">Schulaufgabe</option>
- <option value="kurzarbeit">Kurzarbeit</option>
  <option value="projektvorstellung">Projektvorstellung</option>
  <option value="referat">Referat</option>
  <option value="praesentation">Präsentation</option>
@@ -10970,8 +10965,6 @@ function editCalendarEntry(collectionName,id,title,type,date,time,location,descr
  <label>Titel *<input id="calTitle"type="text"value="${esc(title||"")}"required></label>
  <label>Terminart *
  <select id="calType">
- <option value="schulaufgabe">Schulaufgabe</option>
- <option value="kurzarbeit">Kurzarbeit</option>
  <option value="projektvorstellung">Projektvorstellung</option>
  <option value="referat">Referat</option>
  <option value="praesentation">Präsentation</option>
