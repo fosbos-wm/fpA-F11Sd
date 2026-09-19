@@ -2056,13 +2056,15 @@ async function getPraktikumsbesuche(){
  return snap.docs.map(d=>({id:d.id,...d.data()}));
  }catch(e){console.error("Praktikumsbesuche laden:",e);return[]}
 }
-async function openPraktikumsbesuchForm(id){
+async function openPraktikumsbesuchForm(id,presetRoute){
  const besuche=id?await getPraktikumsbesuche():[];
  const b=besuche.find(x=>x.id===id)||{};
+ const routeWert=b.route||presetRoute||1;
  modal(`<button class="modal-close"onclick="closeModal()">×</button>
  <div class="kicker">PRAKTIKUMSBESUCH</div>
  <h2>${id?"Bearbeiten":"Neue Praktikumsstelle"}</h2>
  <div class="form">
+ <label>Route (Tag)<select id="pbeRoute">${[1,2,3,4].map(r=>`<option value="${r}"${routeWert===r?" selected":""}>Route ${r}</option>`).join("")}</select></label>
  <label>Reihenfolge (Position auf der Route)<input id="pbeReihenfolge"type="number"min="1"value="${b.reihenfolge??""}"placeholder="z. B. 1"></label>
  <label>Schüler:in<input id="pbeSchueler"type="text"value="${esc(b.schueler||"")}"placeholder="Name der/des Schüler:in"></label>
  <label>Praktikumsbetrieb<input id="pbeBetrieb"type="text"value="${esc(b.betrieb||"")}"placeholder="Name der Einrichtung"></label>
@@ -2086,6 +2088,7 @@ async function savePraktikumsbesuch(id){
  const betrieb=$("pbeBetrieb")?.value.trim();
  if(!Number.isFinite(reihenfolge)||!schueler||!betrieb){toast("Bitte mindestens Reihenfolge, Schüler:in und Betrieb angeben.");return}
  const payload={
+ route:parseInt($("pbeRoute")?.value,10)||1,
  reihenfolge,schueler,betrieb,
  adresse:$("pbeAdresse")?.value.trim()||"",
  datum:$("pbeDatum")?.value||"",
@@ -2113,34 +2116,54 @@ async function openPraktikumsbesucheUebersicht(){
 }
 window.openPraktikumsbesucheUebersicht=openPraktikumsbesucheUebersicht;
 
+const ROUTE_CAR_ICON='<svg width="34" height="24" viewBox="0 0 64 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex:0 0 auto"><path d="M4 26 L8 14 Q10 10 16 10 L46 10 Q52 10 54 16 L60 26 Z" fill="#4a90d9"/><rect x="0" y="24" width="64" height="7" rx="3.5" fill="#4a90d9"/><path d="M16 12.5 L21 12.5 Q22.5 12.5 22.5 14.5 L22.5 20 L14.5 20 Z" fill="#eaf3fc"/><path d="M24.5 12.5 L44 12.5 Q46 12.5 47 15 L49 20 L24.5 20 Z" fill="#eaf3fc"/><circle cx="33" cy="15.5" r="2.6" fill="#2f6fb0"/><path d="M29 20 Q29 16.8 33 16.8 Q37 16.8 37 20 Z" fill="#2f6fb0"/><circle cx="16" cy="30" r="5.2" fill="#1c2b39"/><circle cx="16" cy="30" r="2" fill="#fff"/><circle cx="48" cy="30" r="5.2" fill="#1c2b39"/><circle cx="48" cy="30" r="2" fill="#fff"/></svg>';
 async function renderPraktikumsbesuche(){
- const besuche=await getPraktikumsbesuche();
- const geplant=besuche.filter(b=>b.datum).length;
- return`${pageHead("FPA · TERMINPLANUNG","Praktikumsbesuche",`Route und Termine für die Besuche in den Praktikumsstellen. ${geplant} von ${besuche.length} Terminen bereits festgelegt.`,isTeacher()?`<button class="primary"onclick="openPraktikumsbesuchForm()">＋ Praktikumsstelle</button> <button class="secondary"onclick="openPraktikumsbesucheImport()"> Route importieren</button>`:"")}
- ${!besuche.length?`<div class="empty"><strong>Noch keine Praktikumsstellen eingetragen.</strong>${isTeacher()?"Sobald die Adressliste vorliegt, wird hier eine sinnvolle Route (nahe beieinanderliegende Orte hintereinander) vorgeschlagen – du musst dann nur noch Uhrzeit je Station eintragen.":"Die Lehrkraft plant die Besuchsroute – hier erscheinen die Termine, sobald sie feststehen."}</div>`
- :`<div class="kicker"style="margin-bottom:12px">MEINE ROUTE · ${besuche.length} STATIONEN</div>
+ const alleBesuche=await getPraktikumsbesuche();
+ const geplant=alleBesuche.filter(b=>b.datum).length;
+ const routen=[1,2,3,4].map(r=>alleBesuche.filter(b=>(b.route||1)===r).sort((a,b)=>(a.reihenfolge||0)-(b.reihenfolge||0)));
+ return`${pageHead("FPA · TERMINPLANUNG","Praktikumsbesuche",`Route und Termine für die Besuche in den Praktikumsstellen, verteilt auf 4 Routen an unterschiedlichen Tagen. ${geplant} von ${alleBesuche.length} Terminen bereits festgelegt.`,isTeacher()?`<button class="primary"onclick="openPraktikumsbesuchForm()">＋ Praktikumsstelle</button> <button class="secondary"onclick="openPraktikumsbesucheImport()"> Route importieren</button>`:"")}
  <style>
- .route-list{position:relative;margin-top:4px}
- .route-item{position:relative;display:flex;gap:14px;padding-bottom:18px}
+ .route-tiles{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px}
+ .route-tile{flex:1 1 calc(50% - 8px);min-width:280px;box-sizing:border-box}
+ @media(max-width:800px){.route-tile{flex-basis:100%}}
+ .route-tile{background:#fff;border:1px solid var(--line,#e2eaf0);border-radius:14px;padding:16px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+ .route-tile-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+ .route-tile-head strong{display:block;font-size:15px}
+ .route-tile-head small{display:block;color:var(--muted,#65758a);font-size:11.5px;margin-top:1px}
+ .route-tile-head .route-tile-add{margin-left:auto;padding:4px 9px;font-size:11px;white-space:nowrap}
+ .route-tile-empty{font-size:12.5px;color:var(--muted,#65758a);padding:6px 2px}
+ .route-list{position:relative;margin-top:2px}
+ .route-item{position:relative;display:flex;gap:11px;padding-bottom:14px}
  .route-item:last-child{padding-bottom:0}
- .route-item:not(:last-child)::before{content:"";position:absolute;left:17px;top:36px;bottom:0;width:2px;background:var(--line,#e2eaf0)}
- .route-num{flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:#fff;border:2px solid var(--line,#dbe4ea);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--muted,#65758a);position:relative;z-index:1}
+ .route-item:not(:last-child)::before{content:"";position:absolute;left:14px;top:30px;bottom:0;width:2px;background:var(--line,#e2eaf0)}
+ .route-num{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid var(--line,#dbe4ea);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12.5px;color:var(--muted,#65758a);position:relative;z-index:1}
  .route-item--mine .route-num{border-color:#3fa66a;background:#eafaf0;color:#2f8a56}
  .route-item--teacher .route-num{border-color:#4a90d9;background:#eaf3fc;color:#2f6fb0}
- .route-card{flex:1;min-width:0;background:#fff;border:1px solid var(--line,#e2eaf0);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+ .route-card{flex:1;min-width:0;background:#fff;border:1px solid var(--line,#e2eaf0);border-radius:11px;padding:10px 12px}
  .route-item--mine .route-card{border-color:#bfe3cd;background:#f6fbf8}
- .route-name-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
- .route-name{font-weight:700;font-size:15px;color:var(--ink,#1c2b39)}
- .route-mine-pill{display:inline-block;background:#3fa66a;color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:999px;padding:2px 9px}
- .route-org{color:var(--muted,#65758a);font-size:13px;margin-top:3px;line-height:1.4}
- .route-meta-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:10px}
- .route-time-pill{display:inline-flex;align-items:center;gap:5px;background:#eef3f8;color:#2c3e50;border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:600}
+ .route-name-row{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+ .route-name{font-weight:700;font-size:13.5px;color:var(--ink,#1c2b39)}
+ .route-mine-pill{display:inline-block;background:#3fa66a;color:#fff;font-size:9.5px;font-weight:700;letter-spacing:.02em;border-radius:999px;padding:2px 8px}
+ .route-org{color:var(--muted,#65758a);font-size:12px;margin-top:2px;line-height:1.4}
+ .route-meta-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:7px}
+ .route-time-pill{display:inline-flex;align-items:center;gap:5px;background:#eef3f8;color:#2c3e50;border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:600}
  .route-time-pill--open{background:#f4f0e0;color:#8a6d1d}
- .route-note{margin-top:8px;font-size:12px;color:var(--muted,#65758a)}
- .route-edit-row{display:flex;gap:8px;align-items:center;padding-top:12px;margin-top:12px;border-top:1px solid var(--line,#eef2f5);flex-wrap:wrap}
- .route-edit-row input{font-size:12px;padding:5px 7px}
+ .route-note{margin-top:6px;font-size:11.5px;color:var(--muted,#65758a)}
+ .route-edit-row{display:flex;gap:6px;align-items:center;padding-top:9px;margin-top:9px;border-top:1px solid var(--line,#eef2f5);flex-wrap:wrap}
+ .route-edit-row input{font-size:11.5px;padding:4px 6px}
  </style>
- <div class="route-list">${besuche.map(b=>{
+ <div class="route-tiles">${routen.map((stationen,idx)=>{
+ const r=idx+1;
+ const daten=[...new Set(stationen.filter(b=>b.datum).map(b=>b.datum))];
+ const subtitle=!stationen.length?"Noch keine Stationen":daten.length===0?`${stationen.length} Station${stationen.length===1?"":"en"} · noch kein Termin`:daten.length===1?`${stationen.length} Station${stationen.length===1?"":"en"} · ${fmtDateOnly(daten[0])}`:`${stationen.length} Stationen · verschiedene Termine`;
+ return`<div class="route-tile">
+ <div class="route-tile-head">
+ ${ROUTE_CAR_ICON}
+ <div><strong>Route ${r}</strong><small>${esc(subtitle)}</small></div>
+ ${isTeacher()?`<button type="button"class="secondary route-tile-add"onclick="openPraktikumsbesuchForm('',${r})">＋ Station</button>`:""}
+ </div>
+ ${!stationen.length?`<div class="route-tile-empty">${isTeacher()?"Noch keine Stationen für diese Route eingetragen.":"Für diese Route stehen noch keine Termine fest."}</div>`
+ :`<div class="route-list">${stationen.map(b=>{
  const istMeins=!isTeacher()&&(b.schueler||"").toLowerCase().trim()===(profile?.displayName||"").toLowerCase().trim();
  const zeitLabel=b.datum?`${esc(fmtDateOnly(b.datum))}${b.uhrzeit?", "+esc(b.uhrzeit)+" Uhr":""}`:"Termin noch offen";
  return`<div class="route-item${istMeins?" route-item--mine":""}${isTeacher()?" route-item--teacher":""}">
@@ -2149,7 +2172,7 @@ async function renderPraktikumsbesuche(){
  <div class="route-name-row">
  <span class="route-name">${esc(b.schueler)}</span>
  ${istMeins?`<span class="route-mine-pill">DAS BIST DU</span>`:""}
- ${isTeacher()?`<button type="button"class="secondary"style="margin-left:auto;padding:4px 10px;font-size:11px"onclick="openPraktikumsbesuchForm('${b.id}')">Bearbeiten</button>`:""}
+ ${isTeacher()?`<button type="button"class="secondary"style="margin-left:auto;padding:3px 9px;font-size:10.5px"onclick="openPraktikumsbesuchForm('${b.id}')">Bearbeiten</button>`:""}
  </div>
  <div class="route-org">${esc(b.betrieb)}${b.adresse?` · ${esc(b.adresse)}`:""}</div>
  <div class="route-meta-row">
@@ -2159,11 +2182,13 @@ async function renderPraktikumsbesuche(){
  ${isTeacher()?`<div class="route-edit-row">
  <input type="date"id="pbeDatumInline_${b.id}"value="${b.datum||""}">
  <input type="time"id="pbeUhrzeitInline_${b.id}"value="${b.uhrzeit||""}">
- <button type="button"class="secondary"style="padding:4px 10px;font-size:11px"onclick="saveBesuchTermin('${b.id}')">Termin speichern</button>
+ <button type="button"class="secondary"style="padding:4px 9px;font-size:10.5px"onclick="saveBesuchTermin('${b.id}')">Termin speichern</button>
  </div>`:""}
  </div>
  </div>`;
  }).join("")}</div>`}
+ </div>`;
+ }).join("")}</div>
  ${footer()}`;
 }
 window.renderPraktikumsbesuche=renderPraktikumsbesuche;
@@ -2182,13 +2207,15 @@ window.saveBesuchTermin=saveBesuchTermin;
 // "Schüler;Betrieb;Adresse") wird auf einmal angelegt – Reihenfolge
 // ergibt sich aus der Zeilenreihenfolge. Bestehende Einträge werden
 // vorher gelöscht, damit ein erneuter Import nichts verdoppelt.
-function openPraktikumsbesucheImport(){
+function openPraktikumsbesucheImport(presetRoute){
  if(!isTeacher()){toast("Nur Lehrkräfte können importieren.");return}
+ const routeWert=presetRoute||1;
  modal(`<button class="modal-close"onclick="closeModal()">×</button>
  <div class="kicker">PRAKTIKUMSBESUCHE · IMPORT</div>
  <h2>Route importieren</h2>
- <p style="font-size:12px;color:var(--muted)">Eine Zeile pro Station, in der gewünschten Reihenfolge: <code>Schüler;Betrieb;Adresse</code>. Bestehende Einträge werden dabei ersetzt.</p>
+ <p style="font-size:12px;color:var(--muted)">Eine Zeile pro Station, in der gewünschten Reihenfolge: <code>Schüler;Betrieb;Adresse</code>. Bestehende Einträge dieser Route werden dabei ersetzt, die anderen 3 Routen bleiben unberührt.</p>
  <div class="form">
+ <label>Route (Tag)<select id="pbImportRoute">${[1,2,3,4].map(r=>`<option value="${r}"${routeWert===r?" selected":""}>Route ${r}</option>`).join("")}</select></label>
  <textarea id="pbImportText"rows="12"placeholder="Max Mustermann;Kita Sonnenschein;Musterstr. 1, 82362 Weilheim
 Lena Beispiel;AWO Seniorenzentrum;Beispielweg 5, 82362 Weilheim"></textarea>
  <div class="form-actions">
@@ -2201,22 +2228,23 @@ Lena Beispiel;AWO Seniorenzentrum;Beispielweg 5, 82362 Weilheim"></textarea>
 window.openPraktikumsbesucheImport=openPraktikumsbesucheImport;
 async function importPraktikumsbesuche(){
  if(!isTeacher()){toast("Nur Lehrkräfte können importieren.");return}
+ const route=parseInt($("pbImportRoute")?.value,10)||1;
  const text=$("pbImportText")?.value||"";
  const zeilen=text.split("\n").map(z=>z.trim()).filter(Boolean);
  if(!zeilen.length){toast("Bitte mindestens eine Zeile eingeben.");return}
  try{
- const bestehend=await getPraktikumsbesuche();
+ const bestehend=(await getPraktikumsbesuche()).filter(b=>(b.route||1)===route);
  for(const b of bestehend)await deleteDoc(doc(db,"praktikumsbesuche",b.id));
  let reihenfolge=1;
  for(const zeile of zeilen){
  const[schueler,betrieb,adresse]=zeile.split(";").map(t=>(t||"").trim());
  if(!schueler||!betrieb)continue;
  await addDoc(collection(db,"praktikumsbesuche"),{
- reihenfolge,schueler,betrieb,adresse:adresse||"",datum:"",uhrzeit:"",notiz:"",createdAt:serverTimestamp(),updatedAt:serverTimestamp()
+ route,reihenfolge,schueler,betrieb,adresse:adresse||"",datum:"",uhrzeit:"",notiz:"",createdAt:serverTimestamp(),updatedAt:serverTimestamp()
  });
  reihenfolge++;
  }
- toast(`${reihenfolge-1} Stationen importiert.`);
+ toast(`${reihenfolge-1} Stationen in Route ${route} importiert.`);
  closeModal();
  await render();
  }catch(e){console.error("Import fehlgeschlagen:",e);toast(e?.code==="permission-denied"?"Firebase verweigert das Speichern. Bitte die Firestore-Regeln prüfen.":"Import fehlgeschlagen.");}
