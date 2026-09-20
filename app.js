@@ -2123,9 +2123,40 @@ window.openPraktikumsbesucheUebersicht=openPraktikumsbesucheUebersicht;
 const ROUTE_CAR_ICON='<svg width="34" height="24" viewBox="0 0 64 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex:0 0 auto"><path d="M4 26 L8 14 Q10 10 16 10 L46 10 Q52 10 54 16 L60 26 Z" fill="#4a90d9"/><rect x="0" y="24" width="64" height="7" rx="3.5" fill="#4a90d9"/><path d="M16 12.5 L21 12.5 Q22.5 12.5 22.5 14.5 L22.5 20 L14.5 20 Z" fill="#eaf3fc"/><path d="M24.5 12.5 L44 12.5 Q46 12.5 47 15 L49 20 L24.5 20 Z" fill="#eaf3fc"/><circle cx="33" cy="15.5" r="2.6" fill="#2f6fb0"/><path d="M29 20 Q29 16.8 33 16.8 Q37 16.8 37 20 Z" fill="#2f6fb0"/><circle cx="16" cy="30" r="5.2" fill="#1c2b39"/><circle cx="16" cy="30" r="2" fill="#fff"/><circle cx="48" cy="30" r="5.2" fill="#1c2b39"/><circle cx="48" cy="30" r="2" fill="#fff"/></svg>';
 async function renderPraktikumsbesuche(){
  const alleBesuche=await getPraktikumsbesuche();
+
+ // Schüler:innen sehen NICHT die komplette Routenplanung, sondern nur ihren
+ // eigenen Besuchstermin (Datum, Uhrzeit, Route, eigene Praktikumsstelle).
+ if(!isTeacher()){
+ const meinName=(profile?.displayName||"").toLowerCase().trim();
+ const meinTermin=alleBesuche.find(b=>(b.schueler||"").toLowerCase().trim()===meinName);
+ return`${pageHead("FPA · TERMINPLANUNG","Praktikumsbesuche","Dein persönlicher Besuchstermin durch die Lehrkraft.","")}
+ <style>
+ .mein-besuch-card{max-width:460px;background:#fff;border:1px solid #bfe3cd;border-radius:16px;padding:22px;box-shadow:0 1px 2px rgba(16,24,40,.04);margin-top:6px}
+ .mein-besuch-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+ .mein-besuch-route{display:inline-block;background:#3fa66a;color:#fff;font-size:12px;font-weight:700;letter-spacing:.03em;border-radius:999px;padding:4px 13px;margin-bottom:6px}
+ .mein-besuch-head strong{display:block;font-size:19px;color:var(--ink,#1c2b39)}
+ .mein-besuch-zeile{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid #eef2f5}
+ .mein-besuch-zeile:first-of-type{border-top:none}
+ .mein-besuch-label{flex:0 0 110px;color:var(--muted,#65758a);font-size:12.5px;padding-top:2px}
+ .mein-besuch-wert{flex:1;font-size:14.5px;font-weight:600;color:var(--ink,#1c2b39)}
+ .mein-besuch-leer{max-width:460px;background:#fff;border:1px solid var(--line,#e2eaf0);border-radius:16px;padding:22px;color:var(--muted,#65758a);font-size:13.5px;margin-top:6px}
+ </style>
+ ${!meinTermin?`<div class="mein-besuch-leer">Für dich ist noch kein Besuchstermin eingetragen. Sobald die Lehrkraft die Route geplant hat, erscheint dein Termin hier.</div>`
+ :`<div class="mein-besuch-card">
+ <div class="mein-besuch-head">
+ ${ROUTE_CAR_ICON}
+ <div><span class="mein-besuch-route">ROUTE ${meinTermin.route||1}</span><strong>${esc(meinTermin.betrieb||"")}</strong></div>
+ </div>
+ <div class="mein-besuch-zeile"><div class="mein-besuch-label">Adresse</div><div class="mein-besuch-wert">${esc(meinTermin.adresse||"—")}</div></div>
+ <div class="mein-besuch-zeile"><div class="mein-besuch-label">Datum</div><div class="mein-besuch-wert">${meinTermin.datum?esc(fmtDateOnly(meinTermin.datum)):"Termin noch offen"}</div></div>
+ <div class="mein-besuch-zeile"><div class="mein-besuch-label">Uhrzeit</div><div class="mein-besuch-wert">${meinTermin.uhrzeit?esc(meinTermin.uhrzeit)+" Uhr":"—"}</div></div>
+ </div>`}
+ ${footer()}`;
+ }
+
  const geplant=alleBesuche.filter(b=>b.datum).length;
  const routen=[1,2,3,4].map(r=>alleBesuche.filter(b=>(b.route||1)===r).sort((a,b)=>(a.reihenfolge||0)-(b.reihenfolge||0)));
- return`${pageHead("FPA · TERMINPLANUNG","Praktikumsbesuche",`Route und Termine für die Besuche in den Praktikumsstellen, verteilt auf 4 Routen an unterschiedlichen Tagen. ${geplant} von ${alleBesuche.length} Terminen bereits festgelegt.`,isTeacher()?`<button class="primary"onclick="openPraktikumsbesuchForm()">＋ Praktikumsstelle</button> <button class="secondary"onclick="openPraktikumsbesucheImport()"> Route importieren</button>`:"")}
+ return`${pageHead("FPA · TERMINPLANUNG","Praktikumsbesuche",`Route und Termine für die Besuche in den Praktikumsstellen, verteilt auf 4 Routen an unterschiedlichen Tagen. ${geplant} von ${alleBesuche.length} Terminen bereits festgelegt.`,`<button class="primary"onclick="openPraktikumsbesuchForm()">＋ Praktikumsstelle</button> <button class="secondary"onclick="openPraktikumsbesucheImport()"> Route importieren</button>`)}
  <style>
  .route-tiles{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px}
  .route-tile{flex:1 1 calc(50% - 8px);min-width:280px;box-sizing:border-box}
