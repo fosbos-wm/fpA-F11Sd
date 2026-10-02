@@ -25,8 +25,8 @@ function authError(err){
  };
  $("authError").textContent=map[err?.code]||"Anmeldung konnte nicht durchgeführt werden.";
 }
-function modal(html){$("modal").innerHTML=html;$("modalBackdrop").hidden=false}
-function closeModal(){$("modalBackdrop").hidden=true}
+function modal(html){scanReset();$("modal").innerHTML=html;$("modalBackdrop").hidden=false}
+function closeModal(){scanReset();$("modalBackdrop").hidden=true}
 function pageHead(k,h,p,actions=""){return`<div class="page-head"><div><div class="kicker">${k}</div><h1>${h}</h1><p>${p}</p>
 </div><div class="actions">${actions}</div></div>`}
 function footer(){return`<div class="footer"><span>F11Sd 26/27 · FOSBOS Weilheim</span><span>Gemeinsam · offen ·
@@ -2015,14 +2015,24 @@ async function getAllePraktikumsberichte(){
  return snap.docs.map(d=>({id:d.id,...d.data()}));
  }catch(e){console.error("Praktikumsberichte (alle) laden:",e);return[]}
 }
+let pbUploadLaeuft=false;
 async function uploadPraktikumsbericht(phaseId,typ){
- const input=$(`pbFile_${phaseId}_${typ}`);
- const file=input?.files?.[0];
+ if(pbUploadLaeuft)return;
+ const st=scanGet(phaseId,typ);
  const kommentar=$(`pbKommentar_${phaseId}_${typ}`)?.value.trim()||"";
- if(!file){toast("Bitte zuerst eine Datei auswählen.");return}
- if(file.type!=="application/pdf"&&!file.name.toLowerCase().endsWith(".pdf")){toast("Bitte nur PDF-Dateien hochladen.");return}
+ if(!st.pdf&&!st.bilder.length){toast("Bitte zuerst ein Foto aufnehmen oder eine Datei auswählen.");return}
+ pbUploadLaeuft=true;
+ const btn=$(`pbUploadBtn_${phaseId}_${typ}`);if(btn)btn.disabled=true;
  try{
- toast("Datei wird hochgeladen …");
+ let file=st.pdf,info="";
+ if(!file){
+ toast("Fotos werden zu einem PDF verkleinert …");
+ const orig=st.bilder.reduce((n,b)=>n+b.file.size,0);
+ const grau=!!$(`scanGrau_${scanKey(phaseId,typ)}`)?.checked;
+ file=await scanBilderZuPdf(st.bilder.map(b=>b.file),`${typ}_${phaseId}.pdf`,grau);
+ info=` (${scanBytesText(file.size)} statt ${scanBytesText(orig)})`;
+ }
+ toast("Datei wird hochgeladen"+info+" …");
  const up=await uploadCampusDatei(file,`praktikumsberichte/${phaseId}_${typ}`);
  const docId=`${currentUser.uid}_${phaseId}_${typ}`;
  await setDoc(doc(db,"praktikumsberichte",docId),{
@@ -2033,6 +2043,7 @@ async function uploadPraktikumsbericht(phaseId,typ){
  await openPraktikumsblockDetail(phaseId);
  showMotivationsBild();
  }catch(e){console.error("Bericht hochladen:",e);toast("Fehler: "+(e?.message||e));}
+ finally{pbUploadLaeuft=false;if(btn)btn.disabled=false}
 }
 window.uploadPraktikumsbericht=uploadPraktikumsbericht;
 async function saveAmpelBewertung(uid,phaseId,typ){
@@ -2324,7 +2335,7 @@ async function openPraktikumsblockDetail(phaseId){
  :""}
 
  <h3 style="margin-bottom:2px"> Blockberichte</h3>
- <p style="font-size:12px;color:var(--muted);margin-top:0">Formular ausfüllen/unterschreiben lassen, dann hier als Foto/Scan hochladen. Jeweils bis 19:00 Uhr des Abgabetermins. Falls etwas Besonderes ist (z. B. andere Unterschrift als üblich), gerne kurz im Kommentarfeld erwähnen.</p>
+ <p style="font-size:12px;color:var(--muted);margin-top:0">Formular ausfüllen/unterschreiben lassen, dann Seite(n) direkt fotografieren oder Fotos/PDF auswählen – die App macht daraus automatisch ein kleines PDF. Jeweils bis 19:00 Uhr des Abgabetermins. Falls etwas Besonderes ist (z. B. andere Unterschrift als üblich), gerne kurz im Kommentarfeld erwähnen.</p>
  ${typen.map(t=>{
  const eintrag=meineBerichte[`${phaseId}_${t.typ}`];
  const terminDieserArt=t.typ==="einschaetzung"?einschaetzungFrist(phaseId):frist;
@@ -2339,10 +2350,7 @@ async function openPraktikumsblockDetail(phaseId){
  <span class="pill"style="background:${ampelFarbe(eintrag.ampel)};color:#fff">${esc(ampelText(eintrag.ampel))}</span>
  </div>
  ${eintrag.kommentar?`<div class="notice"style="margin-top:8px;border-left:4px solid #9b59b6"><strong style="font-size:11px"> Dein Kommentar</strong><p style="margin:4px 0 0;font-size:12px;white-space:pre-wrap">${esc(eintrag.kommentar)}</p></div>`:""}`
- :`<div class="form-actions"style="margin-top:8px;flex-wrap:wrap">
- <input id="pbFile_${phaseId}_${t.typ}"type="file"accept="application/pdf,.pdf"style="flex:1;min-width:160px">
- <button class="primary"onclick="uploadPraktikumsbericht('${phaseId}','${t.typ}')">＋ Hochladen</button>
- </div>
+ :`${scanUploadHTML(phaseId,t.typ)}
  <textarea id="pbKommentar_${phaseId}_${t.typ}"rows="2"style="margin-top:6px;font-size:12px"placeholder="Kommentar an die Lehrkraft (optional) – z. B. falls jemand anderes als sonst unterschrieben hat"></textarea>`}
  </div>`;
  }).join("")}
@@ -5257,6 +5265,185 @@ async function uploadCampusDatei(file,pfadPrefix){
 function dateiIstBild(name){return /\.(jpe?g|png|gif|webp|svg)$/i.test(name||"")}
 function dateiIstVideo(name){return /\.(mp4|webm|mov|m4v)$/i.test(name||"")}
 function dateiIstAudio(name){return /\.(mp3|wav|ogg|m4a)$/i.test(name||"")}
+// ---- Foto-Scan → kleines PDF (für Blockberichte) -------------------------
+// Schüler:innen können Seiten direkt mit der Handy-/Laptop-Kamera fotografieren
+// oder Bilder auswählen. Die Fotos werden im Browser verkleinert, als JPEG
+// komprimiert und zu EINEM PDF zusammengefasst (ohne externe Bibliothek).
+const SCAN_MAX_SEITEN=10;
+function scanStates(){return window.__scanState||(window.__scanState={})}
+function scanKey(phaseId,typ){return `${phaseId}_${typ}`}
+function scanGet(phaseId,typ){const k=scanKey(phaseId,typ),s=scanStates();return s[k]||(s[k]={pdf:null,bilder:[],stream:null})}
+function scanBytesText(n){return n>=1048576?(n/1048576).toFixed(1).replace(".",",")+" MB":Math.max(1,Math.round(n/1024))+" KB"}
+// Wird bei jedem Modal-Wechsel/Schließen aufgerufen: Kameras aus, Vorschau-URLs frei.
+function scanReset(){
+ const s=window.__scanState;if(!s)return;
+ Object.values(s).forEach(st=>{
+  if(st.stream){st.stream.getTracks().forEach(t=>t.stop());st.stream=null}
+  (st.bilder||[]).forEach(b=>{try{URL.revokeObjectURL(b.url)}catch(e){}});
+ });
+ window.__scanState={};
+}
+function scanUploadHTML(phaseId,typ){
+ const k=scanKey(phaseId,typ);
+ const touch=window.matchMedia&&window.matchMedia("(pointer:coarse)").matches;
+ const lbl='class="secondary scan-btn"';
+ return`<div class="scan-box">
+ <div class="form-actions"style="flex-wrap:wrap;gap:8px">
+ ${touch
+ ?`<label ${lbl}>📷 Seite fotografieren<input type="file"accept="image/*"capture="environment"style="display:none"onchange="scanAddFiles('${phaseId}','${typ}',this)"></label>`
+ :`<button type="button"${lbl}onclick="scanStartKamera('${phaseId}','${typ}')">📷 Webcam nutzen</button>`}
+ <label ${lbl}>🖼️ Fotos/PDF auswählen<input type="file"accept="image/*,application/pdf,.pdf"multiple style="display:none"onchange="scanAddFiles('${phaseId}','${typ}',this)"></label>
+ </div>
+ <div id="scanCam_${k}"></div>
+ <div id="scanThumbs_${k}"></div>
+ <label class="check"style="margin:6px 0"><input type="checkbox"id="scanGrau_${k}"> Graustufen (kleinere Datei, Stempel/Unterschrift bleiben sichtbar)</label>
+ <div class="form-actions"style="margin-top:6px"><button class="primary"id="pbUploadBtn_${k}"type="button"onclick="uploadPraktikumsbericht('${phaseId}','${typ}')">＋ Hochladen</button></div>
+ </div>`;
+}
+function scanRender(phaseId,typ){
+ const k=scanKey(phaseId,typ),st=scanGet(phaseId,typ),box=$(`scanThumbs_${k}`);
+ if(!box)return;
+ if(st.pdf){
+ box.innerHTML=`<div class="notice"style="margin:6px 0">📄 ${esc(st.pdf.name)} (${scanBytesText(st.pdf.size)}) – wird unverändert hochgeladen. <button type="button"class="text-button"onclick="scanEntfernen('${phaseId}','${typ}',-1)">entfernen</button></div>`;
+ return;
+ }
+ if(!st.bilder.length){box.innerHTML="";return}
+ box.innerHTML=`<div class="scan-thumbs">${st.bilder.map((b,i)=>`<div class="scan-thumb"><img src="${b.url}"alt="Seite ${i+1}"><span>Seite ${i+1}</span>
+ <div><button type="button"onclick="scanVerschieben('${phaseId}','${typ}',${i},-1)"title="nach vorn">◀</button><button type="button"onclick="scanVerschieben('${phaseId}','${typ}',${i},1)"title="nach hinten">▶</button><button type="button"onclick="scanEntfernen('${phaseId}','${typ}',${i})"title="entfernen">✕</button></div></div>`).join("")}</div>
+ <small style="color:var(--muted)">${st.bilder.length} Seite(n) – daraus wird beim Hochladen ein verkleinertes PDF erstellt.</small>`;
+}
+function scanAddFiles(phaseId,typ,input){
+ const st=scanGet(phaseId,typ),files=[...(input.files||[])];input.value="";
+ for(const f of files){
+ const istPdf=f.type==="application/pdf"||/\.pdf$/i.test(f.name);
+ if(istPdf){
+ st.bilder.forEach(b=>{try{URL.revokeObjectURL(b.url)}catch(e){}});st.bilder=[];st.pdf=f;break;
+ }
+ if(!/^image\//.test(f.type)&&!/\.(jpe?g|png|webp|heic|heif)$/i.test(f.name)){toast("Nur Fotos oder PDF-Dateien möglich.");continue}
+ st.pdf=null;
+ if(st.bilder.length>=SCAN_MAX_SEITEN){toast(`Maximal ${SCAN_MAX_SEITEN} Seiten pro PDF.`);break}
+ st.bilder.push({file:f,url:URL.createObjectURL(f)});
+ }
+ scanRender(phaseId,typ);
+}
+function scanEntfernen(phaseId,typ,i){
+ const st=scanGet(phaseId,typ);
+ if(i<0){st.pdf=null}else{const b=st.bilder.splice(i,1)[0];if(b)try{URL.revokeObjectURL(b.url)}catch(e){}}
+ scanRender(phaseId,typ);
+}
+function scanVerschieben(phaseId,typ,i,d){
+ const st=scanGet(phaseId,typ),j=i+d;
+ if(j<0||j>=st.bilder.length)return;
+ [st.bilder[i],st.bilder[j]]=[st.bilder[j],st.bilder[i]];
+ scanRender(phaseId,typ);
+}
+// ---- Webcam (Laptop/PC) ----
+async function scanStartKamera(phaseId,typ){
+ const k=scanKey(phaseId,typ),st=scanGet(phaseId,typ),cam=$(`scanCam_${k}`);
+ if(!cam||st.stream)return;
+ try{
+ st.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1080}},audio:false});
+ }catch(e){console.warn("Kamera:",e);toast("Kamera nicht verfügbar oder nicht erlaubt – bitte „Fotos/PDF auswählen“ nutzen.");return}
+ cam.innerHTML=`<video id="scanVideo_${k}"autoplay playsinline muted style="width:100%;max-height:300px;border-radius:8px;background:#000"></video>
+ <div class="form-actions"style="margin-top:6px"><button type="button"class="primary"onclick="scanKameraAufnehmen('${phaseId}','${typ}')">📸 Aufnehmen</button><button type="button"class="secondary"onclick="scanStopKamera('${phaseId}','${typ}')">Kamera schließen</button></div>`;
+ $(`scanVideo_${k}`).srcObject=st.stream;
+}
+function scanStopKamera(phaseId,typ){
+ const k=scanKey(phaseId,typ),st=scanGet(phaseId,typ);
+ if(st.stream){st.stream.getTracks().forEach(t=>t.stop());st.stream=null}
+ const cam=$(`scanCam_${k}`);if(cam)cam.innerHTML="";
+}
+async function scanKameraAufnehmen(phaseId,typ){
+ const v=$(`scanVideo_${scanKey(phaseId,typ)}`);
+ if(!v||!v.videoWidth){toast("Kamerabild noch nicht bereit.");return}
+ const st=scanGet(phaseId,typ);
+ if(st.bilder.length>=SCAN_MAX_SEITEN){toast(`Maximal ${SCAN_MAX_SEITEN} Seiten pro PDF.`);return}
+ const c=document.createElement("canvas");c.width=v.videoWidth;c.height=v.videoHeight;
+ c.getContext("2d").drawImage(v,0,0);
+ const blob=await new Promise(r=>c.toBlob(r,"image/jpeg",0.92));
+ if(!blob){toast("Aufnahme fehlgeschlagen.");return}
+ const f=new File([blob],`scan_${Date.now()}.jpg`,{type:"image/jpeg"});
+ st.pdf=null;st.bilder.push({file:f,url:URL.createObjectURL(f)});
+ scanRender(phaseId,typ);
+}
+// ---- Bild → verkleinertes JPEG ----
+async function scanBildLaden(file){
+ try{return await createImageBitmap(file,{imageOrientation:"from-image"})}
+ catch(e){
+ return await new Promise((res,rej)=>{
+ const img=new Image(),u=URL.createObjectURL(file);
+ img.onload=()=>{URL.revokeObjectURL(u);res(img)};
+ img.onerror=()=>{URL.revokeObjectURL(u);rej(new Error(`„${file.name}“ konnte nicht als Bild gelesen werden.`))};
+ img.src=u;
+ });
+ }
+}
+async function scanBildZuJpeg(file,maxSide,quality,grau){
+ const bmp=await scanBildLaden(file);
+ const sw=bmp.width||bmp.naturalWidth,sh=bmp.height||bmp.naturalHeight;
+ const s=Math.min(1,maxSide/Math.max(sw,sh));
+ const w=Math.max(1,Math.round(sw*s)),h=Math.max(1,Math.round(sh*s));
+ const c=document.createElement("canvas");c.width=w;c.height=h;
+ const ctx=c.getContext("2d",{willReadFrequently:!!grau});
+ ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h);
+ ctx.drawImage(bmp,0,0,w,h);
+ if(bmp.close)bmp.close();
+ if(grau){
+ // Graustufen + Kontrastspreizung: Papier wird weiß, Schrift bleibt dunkel.
+ const im=ctx.getImageData(0,0,w,h),d=im.data,hist=new Uint32Array(256);
+ for(let i=0;i<d.length;i+=4){const g=(d[i]*299+d[i+1]*587+d[i+2]*114)/1000|0;d[i]=d[i+1]=d[i+2]=g;hist[g]++}
+ const total=w*h;let acc=0,lo=0,hi=255;
+ for(let v=0;v<256;v++){acc+=hist[v];if(acc>=total*0.01){lo=v;break}}
+ acc=0;for(let v=0;v<256;v++){acc+=hist[v];if(acc>=total*0.85){hi=v;break}}
+ if(hi-lo<40){lo=0;hi=255}
+ const f=255/(hi-lo);
+ for(let i=0;i<d.length;i+=4){const g=Math.max(0,Math.min(255,((d[i]-lo)*f)|0));d[i]=d[i+1]=d[i+2]=g}
+ ctx.putImageData(im,0,0);
+ }
+ const blob=await new Promise(r=>c.toBlob(r,"image/jpeg",quality));
+ c.width=c.height=0;
+ if(!blob)throw new Error("Bild konnte nicht komprimiert werden.");
+ return{bytes:new Uint8Array(await blob.arrayBuffer()),w,h};
+}
+// ---- Minimaler PDF-Schreiber: JPEG-Seiten (DCTDecode), A4 hoch/quer ----
+function scanBuildPdf(seiten){
+ const enc=new TextEncoder(),chunks=[],offs=[];let len=0;
+ const push=d=>{const b=typeof d==="string"?enc.encode(d):d;chunks.push(b);len+=b.length};
+ const obj=(n,fn)=>{offs[n]=len;push(`${n} 0 obj\n`);fn();push("\nendobj\n")};
+ const f2=x=>(Math.round(x*100)/100).toString();
+ push("%PDF-1.4\n");
+ const kids=seiten.map((_,i)=>`${3+i*3} 0 R`).join(" ");
+ obj(1,()=>push("<< /Type /Catalog /Pages 2 0 R >>"));
+ obj(2,()=>push(`<< /Type /Pages /Kids [${kids}] /Count ${seiten.length} >>`));
+ seiten.forEach((p,i)=>{
+ const pg=3+i*3,ct=pg+1,im=pg+2;
+ const quer=p.w>p.h,pw=quer?841.89:595.28,ph=quer?595.28:841.89;
+ const sc=Math.min(pw/p.w,ph/p.h),dw=p.w*sc,dh=p.h*sc,x=(pw-dw)/2,y=(ph-dh)/2;
+ obj(pg,()=>push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f2(pw)} ${f2(ph)}] /Resources << /XObject << /Im0 ${im} 0 R >> >> /Contents ${ct} 0 R >>`));
+ const cs=`q ${f2(dw)} 0 0 ${f2(dh)} ${f2(x)} ${f2(y)} cm /Im0 Do Q`;
+ obj(ct,()=>push(`<< /Length ${cs.length} >>\nstream\n${cs}\nendstream`));
+ obj(im,()=>{push(`<< /Type /XObject /Subtype /Image /Width ${p.w} /Height ${p.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${p.bytes.length} >>\nstream\n`);push(p.bytes);push("\nendstream")});
+ });
+ const n=3+seiten.length*3,xr=len;
+ push(`xref\n0 ${n}\n0000000000 65535 f \n`);
+ for(let i=1;i<n;i++)push(String(offs[i]).padStart(10,"0")+" 00000 n \n");
+ push(`trailer\n<< /Size ${n} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF`);
+ return new Blob(chunks,{type:"application/pdf"});
+}
+// Fotos → ein PDF; wird die Datei zu groß, automatisch stärker verkleinern.
+async function scanBilderZuPdf(files,name,grau){
+ const stufen=[{m:1800,q:0.72},{m:1500,q:0.6},{m:1200,q:0.5}];
+ let pdf=null;
+ for(const s of stufen){
+ const seiten=[];
+ for(const f of files)seiten.push(await scanBildZuJpeg(f,s.m,s.q,grau));
+ pdf=scanBuildPdf(seiten);
+ if(pdf.size<=DATEI_MAX_BYTES*0.9)break;
+ }
+ return new File([pdf],name,{type:"application/pdf"});
+}
+Object.assign(window,{scanAddFiles,scanEntfernen,scanVerschieben,scanStartKamera,scanStopKamera,scanKameraAufnehmen});
+
 // ---- Mini-Werkzeug-Kacheln: passende Lernwerkstatt-Tools direkt im
 // jeweiligen Arbeitsschritt startbar machen ----------------------------
 function miniToolRow(tools){
