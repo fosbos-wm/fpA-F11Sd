@@ -21,7 +21,7 @@ x=$("toast");x.textContent=t;x.classList.add("show");clearTimeout(window.tt);win
 2500)}
 function authError(err){
  const map={
- "auth/invalid-credential":"E-Mail oder Passwort ist nicht korrekt.","auth/email-already-in-use":"Für diese E-Mail existiert bereits ein Konto.","auth/weak-password":"Das Passwort muss mindestens 6 Zeichen haben.","auth/invalid-email":"Bitte eine gültige E-Mail-Adresse eingeben.","auth/too-many-requests":"Zu viele Versuche. Bitte später erneut versuchen."
+ "auth/invalid-credential":"E-Mail oder Passwort ist nicht korrekt.","auth/email-already-in-use":"Für diese E-Mail existiert bereits ein Konto.","auth/weak-password":"Das Passwort ist zu schwach (mindestens 8 Zeichen, Buchstaben und Zahlen).","auth/invalid-email":"Bitte eine gültige E-Mail-Adresse eingeben.","auth/too-many-requests":"Zu viele Versuche. Bitte später erneut versuchen."
  };
  $("authError").textContent=map[err?.code]||"Anmeldung konnte nicht durchgeführt werden.";
 }
@@ -125,6 +125,7 @@ function showApp(){
 function clearListeners(){unsubscribers.forEach(u=>u&&u());unsubscribers=[]}
 
 async function ensureProfile(user, displayName="", extra={}){
+ if(!extra.firstName&&!extra.lastName&&window.__pendingNames)extra=window.__pendingNames;
  const ref=doc(db,"users",user.uid), snap=await getDoc(ref);
  if(!snap.exists()){
  const firstName=(extra.firstName||"").trim();
@@ -701,21 +702,36 @@ $("loginForm").addEventListener("submit",async e=>{
  await signInWithEmailAndPassword(auth,$("loginEmail").value.trim(),$("loginPassword").value);
  }catch(err){console.error(err);authError(err)}
 });
+let registrierungLaeuft=false;
 $("registerForm").addEventListener("submit",async e=>{
- e.preventDefault();$("authError").textContent="";
+ e.preventDefault();
+ if(registrierungLaeuft)return;
+ $("authError").textContent="";
  const pw=$("registerPassword").value;
  if(pw!==$("registerPassword2").value){$("authError").textContent="Die Passwörter stimmen nicht überein.";return}
  if(pw.length<8||!/[A-Za-zÄÖÜäöüß]/.test(pw)||!/[0-9]/.test(pw)){$("authError").textContent="Das Passwort muss mindestens 8 Zeichen lang sein und Buchstaben UND Zahlen enthalten.";return}
  if(!configReady){$("authError").textContent="Firebase ist noch nicht konfiguriert.";return}
  const {firstName,lastName}=getRegisterNameFields();
  if(!firstName||!lastName){$("authError").textContent="Bitte Vorname und Nachname angeben.";return}
+ const btn=e.target.querySelector('button[type="submit"]');
+ registrierungLaeuft=true;
+ if(btn){btn.disabled=true;btn.textContent="Konto wird erstellt …"}
+ // Namen für den Auth-Listener bereithalten (verhindert Profil "Campus-Mitglied")
+ window.__pendingNames={firstName,lastName};
  try{
  await loadFirebase();
  const cred=await createUserWithEmailAndPassword(auth,$("registerEmail").value.trim(),pw);
  const fullName=`${firstName} ${lastName}`.trim();
  await updateProfile(cred.user,{displayName:fullName});
  await ensureProfile(cred.user,fullName,{firstName,lastName});
- }catch(err){console.error(err);authError(err)}
+ }catch(err){
+ console.error(err);
+ if(err?.code==="auth/email-already-in-use")$("authError").textContent="Für diese E-Mail existiert bereits ein Konto. Bitte melde dich über „Anmelden“ an oder nutze „Passwort vergessen“.";
+ else authError(err);
+ }finally{
+ registrierungLaeuft=false;window.__pendingNames=null;
+ if(btn){btn.disabled=false;btn.textContent="Konto erstellen"}
+ }
 });
 $("forgotBtn").onclick=async()=>{
  const email=$("loginEmail").value.trim();
